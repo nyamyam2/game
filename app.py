@@ -2,10 +2,10 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # 페이지 설정
-st.set_page_config(page_title="스트림릿 네온 배틀", layout="centered")
+st.set_page_config(page_title="스트림릿 네온 배틀: 리밸런스", layout="centered")
 
-st.title("⚔️ 스트림릿 2P 배틀: 어웨이크닝")
-st.caption("새로운 캐릭터 '미리'와 강력한 '궁극기'가 추가되었습니다!")
+st.title("⚔️ 스트림릿 2P 배틀: 리밸런스")
+st.caption("캐릭터 크기 조정 및 사거리/공격 속도 밸런스 업데이트 완료!")
 
 # 게임 로직 (HTML/JS)
 game_html = """
@@ -35,9 +35,12 @@ game_html = """
 
     <div id="select-screen" class="ui-overlay">
         <h2 id="select-title">1P 캐릭터 선택</h2>
-        <button class="char-btn main-btn" onclick="selectChar('Main')">메인<br>(근접/폭발)</button>
-        <button class="char-btn miri-btn" onclick="selectChar('Miri')">미리<br>(원거리/회복)</button>
-        <p style="font-size: 12px; color: #888; margin-top: 15px;">메인: 공20/범위4/궁30<br>미리: 공8/범위8/궁20+힐</p>
+        <button class="char-btn main-btn" onclick="selectChar('Main')">메인<br>(속공/근접)</button>
+        <button class="char-btn miri-btn" onclick="selectChar('Mari')">마리<br>(초장거리)</button>
+        <p style="font-size: 12px; color: #888; margin-top: 15px;">
+            메인: 속도0.7s/범위8/궁10s<br>
+            마리: 속도1.2s/범위20/궁12s
+        </p>
     </div>
 
     <div id="result-screen" class="ui-overlay hidden">
@@ -51,10 +54,10 @@ game_html = """
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         
-        const GRID = 20;
+        const GRID = 20; // 1칸 = 20px
         const GRAVITY = 0.6;
         
-        let gameState = "SELECT"; // SELECT, PLAY, END
+        let gameState = "SELECT";
         let p1Sel = null, p2Sel = null;
 
         const keys = {};
@@ -76,34 +79,34 @@ game_html = """
                 this.type = type;
                 this.x = x;
                 this.y = y;
-                this.width = 40;
-                this.height = 60;
+                // 캐릭터 크기 축소 (40x60 -> 30x45)
+                this.width = 30;
+                this.height = 45;
                 this.vY = 0;
                 this.facing = is1P ? 1 : -1;
                 this.isJumping = false;
                 
-                // 캐릭터별 스탯 설정
                 if(type === "Main") {
                     this.name = "메인";
                     this.hp = 100;
                     this.maxHp = 100;
                     this.damage = 20;
-                    this.range = 4 * GRID;
-                    this.atkDelay = 60; // 1초 (60fps)
+                    this.range = 8 * GRID; // 사거리 8칸
+                    this.atkDelay = 42; // 0.7초 (60fps * 0.7)
                     this.ultDamage = 30;
-                    this.ultRange = 6 * GRID;
+                    this.ultRange = 10 * GRID;
                     this.ultMaxCooldown = 600; // 10초
                     this.color = "#1e90ff";
                 } else {
-                    this.name = "미리";
+                    this.name = "마리";
                     this.hp = 90;
                     this.maxHp = 90;
                     this.damage = 8;
-                    this.range = 8 * GRID;
-                    this.atkDelay = 90; // 1.5초
+                    this.range = 20 * GRID; // 사거리 20칸 (화면 절반 이상)
+                    this.atkDelay = 72; // 1.2초 (60fps * 1.2)
                     this.ultDamage = 20;
-                    this.ultRange = 4 * GRID; // AoE 범위 (반경)
-                    this.ultMaxCooldown = 780; // 13초
+                    this.ultRange = 4 * GRID;
+                    this.ultMaxCooldown = 720; // 12초
                     this.color = "#ff00ff";
                 }
 
@@ -114,60 +117,52 @@ game_html = """
             }
 
             draw() {
-                // 몸체
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 15;
                 ctx.shadowColor = this.color;
                 ctx.fillStyle = this.color;
                 ctx.fillRect(this.x, this.y, this.width, this.height);
                 ctx.shadowBlur = 0;
 
-                // 머리 장식 (메인은 뿔, 미리는 리본 느낌)
                 ctx.fillStyle = "white";
                 if(this.type === "Main") {
-                    ctx.fillRect(this.x + 10, this.y - 5, 20, 5);
+                    ctx.fillRect(this.x + 5, this.y - 5, 20, 5);
                 } else {
                     ctx.beginPath();
-                    ctx.arc(this.x + 20, this.y - 5, 8, 0, Math.PI * 2);
+                    ctx.arc(this.x + 15, this.y - 5, 6, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                // UI (이름, HP, 쿨다운)
                 ctx.fillStyle = "white";
-                ctx.font = "12px Arial";
+                ctx.font = "11px Arial";
                 ctx.fillText(this.name + (this.is1P ? "(1P)" : "(2P)"), this.x, this.y - 30);
                 
-                // HP Bar
                 ctx.fillStyle = "#333";
-                ctx.fillRect(this.x, this.y - 20, 40, 5);
+                ctx.fillRect(this.x, this.y - 20, 30, 4);
                 ctx.fillStyle = this.hp < 30 ? "red" : "lime";
-                ctx.fillRect(this.x, this.y - 20, (this.hp / this.maxHp) * 40, 5);
+                ctx.fillRect(this.x, this.y - 20, (this.hp / this.maxHp) * 30, 4);
 
-                // Ult Cooldown Bar
                 ctx.fillStyle = "rgba(255,255,255,0.3)";
-                ctx.fillRect(this.x, this.y - 12, 40, 3);
+                ctx.fillRect(this.x, this.y - 14, 30, 2);
                 ctx.fillStyle = "yellow";
-                let ultBar = (1 - this.ultCooldown / this.ultMaxCooldown) * 40;
-                ctx.fillRect(this.x, this.y - 12, Math.max(0, ultBar), 3);
+                let ultBar = (1 - this.ultCooldown / this.ultMaxCooldown) * 30;
+                ctx.fillRect(this.x, this.y - 14, Math.max(0, ultBar), 2);
 
-                // 공격 이펙트
                 if(this.effectTimer > 0) {
-                    ctx.fillStyle = "rgba(255,255,255,0.5)";
+                    ctx.fillStyle = this.type === "Main" ? "rgba(30,144,255,0.4)" : "rgba(255,0,255,0.4)";
                     let rX = this.facing === 1 ? this.x + this.width : this.x - this.range;
-                    ctx.fillRect(rX, this.y + 20, this.range, 10);
+                    ctx.fillRect(rX, this.y + 15, this.range, 8);
                     this.effectTimer--;
                 }
 
-                // 궁극기 이펙트
                 if(this.ultEffectTimer > 0) {
                     ctx.strokeStyle = "yellow";
-                    ctx.lineWidth = 3;
+                    ctx.lineWidth = 2;
                     if(this.type === "Main") {
                         let rX = this.facing === 1 ? this.x + this.width : this.x - this.ultRange;
                         ctx.strokeRect(rX, this.y, this.ultRange, this.height);
                     } else {
-                        // 미리 AoE (원형)
                         ctx.beginPath();
-                        ctx.arc(this.x + 20, this.y + 30, this.ultRange, 0, Math.PI * 2);
+                        ctx.arc(this.x + 15, this.y + 22, this.ultRange, 0, Math.PI * 2);
                         ctx.stroke();
                     }
                     this.ultEffectTimer--;
@@ -191,17 +186,16 @@ game_html = """
 
             jump() {
                 if (!this.isJumping) {
-                    this.vY = -13;
+                    this.vY = -12;
                     this.isJumping = true;
                 }
             }
 
             attack(opp) {
                 if(this.atkCooldown > 0) return;
-                this.effectTimer = 10;
+                this.effectTimer = 8;
                 this.atkCooldown = this.atkDelay;
                 
-                let hit = false;
                 let myL = this.facing === 1 ? this.x + this.width : this.x - this.range;
                 let myR = this.facing === 1 ? this.x + this.width + this.range : this.x;
 
@@ -213,7 +207,7 @@ game_html = """
 
             useUltimate(opp) {
                 if(this.ultCooldown > 0) return;
-                this.ultEffectTimer = 20;
+                this.ultEffectTimer = 15;
                 this.ultCooldown = this.ultMaxCooldown;
 
                 if(this.type === "Main") {
@@ -224,11 +218,10 @@ game_html = """
                         opp.hp -= this.ultDamage;
                     }
                 } else {
-                    // 미리 궁극기: 주변 원형 범위
-                    let dx = (this.x + 20) - (opp.x + 20);
-                    let dy = (this.y + 30) - (opp.y + 30);
+                    let dx = (this.x + 15) - (opp.x + 15);
+                    let dy = (this.y + 22) - (opp.y + 22);
                     let dist = Math.sqrt(dx*dx + dy*dy);
-                    if(dist < this.ultRange + 20) {
+                    if(dist < this.ultRange + 15) {
                         opp.hp -= this.ultDamage;
                     }
                     this.hp = Math.min(this.maxHp, this.hp + 10);
@@ -250,8 +243,8 @@ game_html = """
         }
 
         function startGame() {
-            p1 = new Player(100, 200, p1Sel, true);
-            p2 = new Player(660, 200, p2Sel, false);
+            p1 = new Player(150, 200, p1Sel, true);
+            p2 = new Player(620, 200, p2Sel, false);
             gameState = "PLAY";
         }
 
@@ -265,26 +258,20 @@ game_html = """
 
         function gameLoop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // 바닥
             ctx.fillStyle = "#333";
             ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
 
             if(gameState === "PLAY") {
-                // 1P 이동
                 if (keys["KeyA"]) { p1.x -= 5; p1.facing = -1; }
                 if (keys["KeyD"]) { p1.x += 5; p1.facing = 1; }
                 if (keys["Space"]) p1.jump();
 
-                // 2P 이동
                 if (keys["ArrowLeft"]) { p2.x -= 5; p2.facing = -1; }
                 if (keys["ArrowRight"]) { p2.x += 5; p2.facing = 1; }
                 if (keys["ArrowUp"]) p2.jump();
 
-                p1.update();
-                p2.update();
-                p1.draw();
-                p2.draw();
+                p1.update(); p2.update();
+                p1.draw(); p2.draw();
 
                 if(p1.hp <= 0 || p2.hp <= 0) {
                     gameState = "END";
@@ -298,10 +285,8 @@ game_html = """
             } else {
                 p1.draw(); p2.draw();
             }
-            
             requestAnimationFrame(gameLoop);
         }
-
         gameLoop();
     </script>
 </body>
@@ -312,14 +297,12 @@ game_html = """
 components.html(game_html, height=550)
 
 st.markdown("""
-### 🎮 조작법 안내
-| 기능 | 1P (좌측) | 2P (우측) |
-| :--- | :--- | :--- |
-| **이동/점프** | A, D / Space | ◀, ▶ / ▲ |
-| **일반 공격** | **F** | **▼ (아래 화살표)** |
-| **궁극기** | **G** | **L** |
-
-**캐릭터 특징:**
-- **메인:** 높은 체력과 강력한 공격력. 궁극기는 전방의 적에게 큰 피해를 줍니다.
-- **미리:** 긴 사거리로 견제에 능합니다. 궁극기는 주변 적에게 피해를 주고 자신의 체력을 회복합니다.
+### 📢 업데이트 로그
+1. **크기 축소:** 캐릭터 크기가 약 25% 작아져서 더 넓은 전장 활용이 가능합니다.
+2. **마리(Mari) 상향:** 
+   - 사거리가 **20칸**으로 대폭 증가하여 멀리서 저격이 가능합니다.
+   - 공격 속도 **1.2초**, 궁극기 쿨타임 **12초**로 조정되었습니다.
+3. **메인(Main) 상향:** 
+   - 공격 속도가 **0.7초**로 매우 빨라져 근접전 화력이 강화되었습니다.
+   - 사거리 **8칸**으로 상향되어 접근이 용이해졌습니다.
 """)
