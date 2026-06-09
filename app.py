@@ -2,10 +2,10 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # 페이지 설정
-st.set_page_config(page_title="스트림릿 네온 배틀: 리밸런스", layout="centered")
+st.set_page_config(page_title="스트림릿 네온 배틀: 파이널 오버홀", layout="centered")
 
-st.title("⚔️ 스트림릿 2P 배틀: 리밸런스")
-st.caption("캐릭터 크기 조정 및 사거리/공격 속도 밸런스 업데이트 완료!")
+st.title("⚔️ 스트림릿 2P 배틀: 파이널 오버홀")
+st.caption("마리의 저격 능력 조정 및 메인의 초고속 공격 & 디버프 궁극기 업데이트!")
 
 # 게임 로직 (HTML/JS)
 game_html = """
@@ -35,11 +35,11 @@ game_html = """
 
     <div id="select-screen" class="ui-overlay">
         <h2 id="select-title">1P 캐릭터 선택</h2>
-        <button class="char-btn main-btn" onclick="selectChar('Main')">메인<br>(속공/근접)</button>
-        <button class="char-btn miri-btn" onclick="selectChar('Mari')">마리<br>(초장거리)</button>
+        <button class="char-btn main-btn" onclick="selectChar('Main')">메인<br>(광속/디버프)</button>
+        <button class="char-btn miri-btn" onclick="selectChar('Mari')">마리<br>(저격/고위력궁)</button>
         <p style="font-size: 12px; color: #888; margin-top: 15px;">
-            메인: 속도0.7s/범위8/궁10s<br>
-            마리: 속도1.2s/범위20/궁12s
+            메인: HP110/이속+8%/속도0.5s/범위6/궁9s(감속)<br>
+            마리: HP 90/속도1.3s/범위18/궁12s(피해25)
         </p>
     </div>
 
@@ -54,7 +54,7 @@ game_html = """
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         
-        const GRID = 20; // 1칸 = 20px
+        const GRID = 20; 
         const GRAVITY = 0.6;
         
         let gameState = "SELECT";
@@ -79,34 +79,38 @@ game_html = """
                 this.type = type;
                 this.x = x;
                 this.y = y;
-                // 캐릭터 크기 축소 (40x60 -> 30x45)
                 this.width = 30;
                 this.height = 45;
                 this.vY = 0;
                 this.facing = is1P ? 1 : -1;
                 this.isJumping = false;
                 
+                // 디버프 관련 상태
+                this.slowTimer = 0;
+                this.baseSpeed = 5;
+
                 if(type === "Main") {
                     this.name = "메인";
-                    this.hp = 100;
-                    this.maxHp = 100;
+                    this.hp = 110;          // 체력 상향
+                    this.maxHp = 110;
                     this.damage = 20;
-                    this.range = 8 * GRID; // 사거리 8칸
-                    this.atkDelay = 42; // 0.7초 (60fps * 0.7)
-                    this.ultDamage = 30;
-                    this.ultRange = 10 * GRID;
-                    this.ultMaxCooldown = 600; // 10초
+                    this.range = 6 * GRID;  // 사거리 6칸
+                    this.atkDelay = 30;     // 0.5초 (60fps * 0.5)
+                    this.baseSpeed = 5 * 1.08; // 이동속도 8% 증가 (5.4)
+                    this.ultDamage = 20;    // 궁극기 데미지 조정
+                    this.ultRange = 8 * GRID; 
+                    this.ultMaxCooldown = 540; // 궁극기 쿨타임 9초 (60fps * 9)
                     this.color = "#1e90ff";
                 } else {
                     this.name = "마리";
                     this.hp = 90;
                     this.maxHp = 90;
                     this.damage = 8;
-                    this.range = 20 * GRID; // 사거리 20칸 (화면 절반 이상)
-                    this.atkDelay = 72; // 1.2초 (60fps * 1.2)
-                    this.ultDamage = 20;
+                    this.range = 18 * GRID; // 사거리 18칸
+                    this.atkDelay = 78;     // 1.3초 (60fps * 1.3)
+                    this.ultDamage = 25;    // 궁극기 데미지 25
                     this.ultRange = 4 * GRID;
-                    this.ultMaxCooldown = 720; // 12초
+                    this.ultMaxCooldown = 720; // 궁극기 쿨타임 12초
                     this.color = "#ff00ff";
                 }
 
@@ -116,10 +120,25 @@ game_html = """
                 this.ultEffectTimer = 0;
             }
 
+            // 현재 이동 속도 계산 (디버프 반영)
+            get currentSpeed() {
+                if (this.slowTimer > 0) {
+                    return this.baseSpeed * 0.85; // 15% 감속
+                }
+                return this.baseSpeed;
+            }
+
             draw() {
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = this.color;
-                ctx.fillStyle = this.color;
+                
+                // 슬로우 상태일 때 캐릭터 색상 보라/하얗게 변조 효과
+                if (this.slowTimer > 0) {
+                    ctx.fillStyle = "#57606f"; 
+                } else {
+                    ctx.fillStyle = this.color;
+                }
+                
                 ctx.fillRect(this.x, this.y, this.width, this.height);
                 ctx.shadowBlur = 0;
 
@@ -136,6 +155,13 @@ game_html = """
                 ctx.font = "11px Arial";
                 ctx.fillText(this.name + (this.is1P ? "(1P)" : "(2P)"), this.x, this.y - 30);
                 
+                // 감속 디버프 표시
+                if (this.slowTimer > 0) {
+                    ctx.fillStyle = "#00f2ff";
+                    ctx.font = "9px Arial";
+                    ctx.fillText("SLOW", this.x, this.y - 38);
+                }
+
                 ctx.fillStyle = "#333";
                 ctx.fillRect(this.x, this.y - 20, 30, 4);
                 ctx.fillStyle = this.hp < 30 ? "red" : "lime";
@@ -155,7 +181,7 @@ game_html = """
                 }
 
                 if(this.ultEffectTimer > 0) {
-                    ctx.strokeStyle = "yellow";
+                    ctx.strokeStyle = this.type === "Main" ? "#00f2ff" : "yellow";
                     ctx.lineWidth = 2;
                     if(this.type === "Main") {
                         let rX = this.facing === 1 ? this.x + this.width : this.x - this.ultRange;
@@ -182,6 +208,7 @@ game_html = """
                 
                 if(this.atkCooldown > 0) this.atkCooldown--;
                 if(this.ultCooldown > 0) this.ultCooldown--;
+                if(this.slowTimer > 0) this.slowTimer--; // 슬로우 타이머 감소
             }
 
             jump() {
@@ -216,6 +243,7 @@ game_html = """
                     if(myR >= opp.x && myL <= opp.x + opp.width && 
                        this.y + this.height >= opp.y && this.y <= opp.y + opp.height) {
                         opp.hp -= this.ultDamage;
+                        opp.slowTimer = 90; // 1.5초간 감속 디버프 (60fps * 1.5 = 90)
                     }
                 } else {
                     let dx = (this.x + 15) - (opp.x + 15);
@@ -262,12 +290,12 @@ game_html = """
             ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
 
             if(gameState === "PLAY") {
-                if (keys["KeyA"]) { p1.x -= 5; p1.facing = -1; }
-                if (keys["KeyD"]) { p1.x += 5; p1.facing = 1; }
+                if (keys["KeyA"]) { p1.x -= p1.currentSpeed; p1.facing = -1; }
+                if (keys["KeyD"]) { p1.x += p1.currentSpeed; p1.facing = 1; }
                 if (keys["Space"]) p1.jump();
 
-                if (keys["ArrowLeft"]) { p2.x -= 5; p2.facing = -1; }
-                if (keys["ArrowRight"]) { p2.x += 5; p2.facing = 1; }
+                if (keys["ArrowLeft"]) { p2.x -= p2.currentSpeed; p2.facing = -1; }
+                if (keys["ArrowRight"]) { p2.x += p2.currentSpeed; p2.facing = 1; }
                 if (keys["ArrowUp"]) p2.jump();
 
                 p1.update(); p2.update();
@@ -293,16 +321,15 @@ game_html = """
 </html>
 """
 
-# 스트림릿 출력
 components.html(game_html, height=550)
 
 st.markdown("""
-### 📢 업데이트 로그
-1. **크기 축소:** 캐릭터 크기가 약 25% 작아져서 더 넓은 전장 활용이 가능합니다.
-2. **마리(Mari) 상향:** 
-   - 사거리가 **20칸**으로 대폭 증가하여 멀리서 저격이 가능합니다.
-   - 공격 속도 **1.2초**, 궁극기 쿨타임 **12초**로 조정되었습니다.
-3. **메인(Main) 상향:** 
-   - 공격 속도가 **0.7초**로 매우 빨라져 근접전 화력이 강화되었습니다.
-   - 사거리 **8칸**으로 상향되어 접근이 용이해졌습니다.
+### 📢 밸런스 패치 노트 (최종 하이라이트)
+* **마리 (Mari):**
+  - 일반 사거리가 **18칸**으로 미세 조정되었고, 공격 속도가 **1.3초**로 변경되어 거리 조절의 중요성이 커졌습니다.
+  - 대신 궁극기(L키) 직격 피해량이 **25**로 상향되어 결정력이 강화되었습니다.
+* **메인 (Main):**
+  - 체력이 **110**으로 증가하고 기본 이동 속도가 **8%** 빨라져 인파이팅 능력이 극대화되었습니다.
+  - 일반 사거리가 **6칸**으로 좁혀진 대신, 공격 속도가 **0.5초**로 가공할 만한 속사형으로 변모했습니다.
+  - 궁극기 쿨타임이 **9초**로 대폭 감소하고 피해량이 **20**이 된 대신, 적중 시 **1.5초간 적의 이동속도를 15% 느리게 만듭니다** (적중 시 상대 위에 `SLOW` 표시).
 """)
