@@ -1,13 +1,13 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# 페이지 설정
-st.set_page_config(page_title="스트림릿 네온 배틀: 1.1v", layout="centered")
+# 페이지 레이아웃 및 스타일 최적화
+st.set_page_config(page_title="네온 배틀 v1.15", layout="centered")
 
-st.title("⚔️ 네온 배틀 버전 1.1v 공식 업데이트")
-st.caption("신캐 '클랩' 참전! 선택 창 비주얼 전면 개편 및 궁극기 게이지 가시성 확보 완료.")
+st.title("⚔️ 네온 배틀 버전 1.15v 공식 패치")
+st.caption("클랩 궁극기 스택 초기화 반영, 마리 긴 생머리 변신 및 전 캐릭터 고화질 안면 눈매 드로잉")
 
-# 게임 소스코드 (HTML/JS/CSS)
+# 인게임 및 픽창 웹 컴포넌트 소스코드
 game_html = """
 <!DOCTYPE html>
 <html>
@@ -24,39 +24,51 @@ game_html = """
         .char-card { background: #1a1a26; border: 2px solid #2d2d3d; border-radius: 10px; padding: 6px; width: 105px; cursor: pointer; transition: 0.2s; text-align: center; }
         .char-card:hover { transform: scale(1.03); border-color: #00f2ff; background: #222235; }
         
-        /* 🎨 1.1v 고화질 인물 일러스트 박스 (SVG 레이어 공정) */
+        /* 🎨 v1.15v 그래픽 엔진: SVG 및 고정밀 CSS 마스크 페이스 칩 */
         .avatar-frame { width: 55px; height: 55px; margin: 0 auto 5px; background: #242436; border-radius: 50%; border: 2px solid #3d3d5c; overflow: hidden; position: relative; }
         
-        /* [메인] 샤프한 비즈니스 컷 + 블랙 보잉 선글라스 코디 */
+        /* 공통 눈 그래픽 컴포넌트 */
+        .eye-left, .eye-right { background: #111; width: 4px; height: 4px; border-radius: 50%; position: absolute; top: 12px; z-index: 5; }
+        .eye-left { left: 6px; }
+        .eye-right { left: 16px; }
+        /* 홍채/동공 반짝임 하이라이트 효과 */
+        .eye-left::after, .eye-right::after { content: ''; background: #fff; width: 1.5px; height: 1.5px; border-radius: 50%; position: absolute; top: 0.5px; left: 0.5px; }
+
+        /* [메인] 샤프 정장 + 뚜렷하고 깊이감 있는 눈빛 (선글라스 해제 버전으로 매력 극대화) */
         .hero-main { background: #ffd2a1; width: 30px; height: 32px; border-radius: 50%; position: absolute; bottom: 8px; left: 12px; }
         .main-hair-top { background: #1a1a1a; width: 34px; height: 16px; position: absolute; top: -3px; left: -2px; border-radius: 8px 8px 0 0; }
-        .main-sunglass { background: #111; width: 26px; height: 7px; position: absolute; top: 11px; left: 2px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         .main-suit { background: #1e90ff; width: 40px; height: 15px; position: absolute; bottom: 0; left: -5px; border-radius: 4px 4px 0 0; }
 
-        /* [마리] 고 퀄리티 여성 일러스트: 페미닌 사이드 뱅 + 로즈 핑크 트윈 블렌딩 + 고급 실크 리본 */
-        .hero-mari { background: #ffe3ca; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 10px; left: 13px; }
-        .mari-hair-main { background: #ff527b; width: 34px; height: 18px; position: absolute; top: -4px; left: -3px; border-radius: 10px 10px 0 0; }
-        .mari-bangs { background: #ff527b; width: 12px; height: 14px; position: absolute; top: 6px; left: -1px; border-radius: 0 0 6px 0; transform: rotate(15deg); }
-        .mari-ribbon-l { background: #ff77ff; width: 10px; height: 10px; border-radius: 50%; position: absolute; top: 4px; left: -7px; border: 1px solid #fff; }
-        .mari-ribbon-r { background: #ff77ff; width: 10px; height: 10px; border-radius: 50%; position: absolute; top: 4px; left: 25px; border: 1px solid #fff; }
-        .mari-blush { background: rgba(255,107,129,0.5); width: 5px; height: 3px; border-radius: 50%; position: absolute; top: 15px; left: 3px; box-shadow: 15px 0 rgba(255,107,129,0.5); }
+        /* [마리] 🎀 대변신: 트윈테일을 풀고 여성미 넘치는 고품격 '긴 생머리 (Long Straight)' 및 크고 예쁜 눈매 연출 */
+        .hero-mari { background: #ffe3ca; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 10px; left: 13px; z-index: 2; }
+        /* 양옆으로 차분하게 흘러내리는 긴 생머리 컴포넌트 */
+        .mari-long-hair-back { background: #4a2831; width: 34px; height: 38px; position: absolute; top: 12px; left: 10px; border-radius: 4px 4px 12px 12px; z-index: 1; }
+        .mari-hair-top { background: #ff527b; width: 32px; height: 16px; position: absolute; top: -4px; left: -2px; border-radius: 8px 8px 0 0; }
+        .mari-bangs { background: #ff527b; width: 14px; height: 12px; position: absolute; top: 4px; left: 0px; border-radius: 0 0 5px 0; }
+        .mari-ribbon { background: #ff77ff; width: 12px; height: 6px; position: absolute; top: -7px; left: 8px; border-radius: 3px; z-index: 6; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .mari-blush { background: rgba(255,107,129,0.6); width: 4px; height: 2.5px; border-radius: 50%; position: absolute; top: 16px; left: 3px; box-shadow: 14px 0 rgba(255,107,129,0.6); }
         .mari-dress { background: #ff00ff; width: 36px; height: 14px; position: absolute; bottom: -12px; left: -4px; border-radius: 50% 50% 0 0; }
+        /* 마리 전용 더 예쁘고 큰 여성용 눈 */
+        .mari-eye-l, .mari-eye-r { background: #2f192e; width: 5px; height: 5px; border-radius: 50%; position: absolute; top: 11px; z-index: 5; border-top: 1px solid #111; }
+        .mari-eye-l { left: 5px; }
+        .mari-eye-r { left: 15px; }
+        .mari-eye-l::after, .mari-eye-r::after { content: ''; background: #fff; width: 2px; height: 2px; border-radius: 50%; position: absolute; top: 0.5px; left: 0.5px; }
 
-        /* [스타] 왕관 황실 전사 */
+        /* [스타] 왕관 황실 전사 + 총명한 파란 눈 */
         .hero-star { background: #ffe0bd; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 13px; }
-        .star-crown-gold { background: #f1c40f; width: 22px; height: 12px; position: absolute; top: -10px; left: 3px; clip-path: polygon(0 100%, 0 20%, 30% 60%, 50% 0, 70% 60%, 100% 20%, 100% 100%); }
+        .star-crown-gold { background: #f1c40f; width: 22px; height: 12px; position: absolute; top: -10px; left: 3px; clip-path: polygon(0 100%, 0 20%, 30% 60%, 50% 0, 70% 60%, 100% 20%, 100% 100%); z-index: 6; }
         .star-hair-blonde { background: #fecc5c; width: 32px; height: 14px; position: absolute; top: -2px; left: -2px; border-radius: 6px 6px 0 0; }
         
-        /* [잼] 모자 쓴 후디 소년 */
+        /* [잼] 모자 소년 + 장난기 가득한 눈 */
         .hero-jam { background: #ffd2a1; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 13px; }
-        .jam-green-cap { background: #2ed573; width: 32px; height: 12px; position: absolute; top: -4px; left: -2px; border-radius: 4px 4px 0 0; transform: rotate(-5deg); }
+        .jam-green-cap { background: #2ed573; width: 32px; height: 12px; position: absolute; top: -4px; left: -2px; border-radius: 4px 4px 0 0; transform: rotate(-4deg); z-index: 6; }
         .jam-cap-visor { background: #1b944c; width: 14px; height: 4px; position: absolute; top: 4px; left: 20px; border-radius: 2px; }
 
-        /* [클랩] 1.1v 신캐: 힙합 헤드셋을 장착하고 박수칠 준비가 완료된 박수 아티스트 */
+        /* [클랩] 헤드셋 박수 아티스트 + 열정적인 눈빛 */
         .hero-clap { background: #fcd1a1; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 13px; }
         .clap-hair { background: #eccc68; width: 32px; height: 14px; position: absolute; top: -3px; left: -2px; border-radius: 6px 6px 0 0; }
-        .clap-headphone-l { background: #ff4757; width: 6px; height: 14px; position: absolute; top: 6px; left: -4px; border-radius: 3px; }
-        .clap-headphone-r { background: #ff4757; width: 6px; height: 14px; position: absolute; top: 6px; left: 26px; border-radius: 3px; }
+        .clap-headphone-l { background: #ff4757; width: 6px; height: 14px; position: absolute; top: 6px; left: -4px; border-radius: 3px; z-index: 6; }
+        .clap-headphone-r { background: #ff4757; width: 6px; height: 14px; position: absolute; top: 6px; left: 26px; border-radius: 3px; z-index: 6; }
         .clap-cloth { background: #ffa502; width: 36px; height: 12px; position: absolute; bottom: -10px; left: -4px; border-radius: 3px; }
 
         .map-container { display: flex; justify-content: center; gap: 10px; margin: 5px 0; }
@@ -78,15 +90,15 @@ game_html = """
         </div>
 
         <div id="select-screen" class="ui-overlay">
-            <h3 id="select-title" style="color:#00f2ff; margin: 0 0 2px 0; font-size: 15px;">1P 영웅 낙점 (v1.1v)</h3>
-            <p id="select-subtitle" style="font-size:11px; color:#aaa; margin:0 0 6px 0;">캐릭터 외형 퀄리티 고도화 패치 완료</p>
+            <h3 id="select-title" style="color:#00f2ff; margin: 0 0 2px 0; font-size: 15px;">1P 영웅 낙점 (v1.15v)</h3>
+            <p id="select-subtitle" style="font-size:11px; color:#aaa; margin:0 0 6px 0;">클랩 궁극기 스택 초기화 반영 및 미형 외형 패치</p>
             
             <div class="char-container">
                 <div class="char-card" onclick="selectChar('Main')">
                     <div class="avatar-frame">
                         <div class="hero-main">
                             <div class="main-hair-top"></div>
-                            <div class="main-sunglass"></div>
+                            <div class="eye-left"></div><div class="eye-right"></div>
                             <div class="main-suit"></div>
                         </div>
                     </div>
@@ -94,17 +106,18 @@ game_html = """
                     <div style="font-size:9px; color:#ccc; margin-top:2px; line-height:11px;">공속 0.3s | 공격 7<br>궁 11s (30%감속)</div>
                 </div>
                 <div class="char-card" onclick="selectChar('Mari')">
+                    <div class="mari-long-hair-back"></div>
                     <div class="avatar-frame" style="background:#3a2936; border-color:#5c3d52;">
                         <div class="hero-mari">
-                            <div class="mari-hair-main"></div>
+                            <div class="mari-hair-top"></div>
                             <div class="mari-bangs"></div>
-                            <div class="mari-ribbon-l"></div>
-                            <div class="mari-ribbon-r"></div>
+                            <div class="mari-ribbon"></div>
+                            <div class="mari-eye-l"></div><div class="mari-eye-r"></div>
                             <div class="mari-blush"></div>
                             <div class="mari-dress"></div>
                         </div>
                     </div>
-                    <strong style="color:#ff77ff; font-size:11px;">마리</strong>
+                    <strong style="color:#ff77ff; font-size:11px;">마리👩‍🦰</strong>
                     <div style="font-size:9px; color:#ccc; margin-top:2px; line-height:11px;">공속 1.25s | 사거리 15<br>이속 -5% | 공격 9</div>
                 </div>
                 <div class="char-card" onclick="selectChar('Star')">
@@ -112,6 +125,7 @@ game_html = """
                         <div class="hero-star">
                             <div class="star-hair-blonde"></div>
                             <div class="star-crown-gold"></div>
+                            <div class="eye-left" style="background:#1e90ff;"></div><div class="eye-right" style="background:#1e90ff;"></div>
                         </div>
                     </div>
                     <strong style="color:#ffca28; font-size:11px;">스타</strong>
@@ -121,6 +135,7 @@ game_html = """
                     <div class="avatar-frame">
                         <div class="hero-jam">
                             <div class="jam-green-cap"><div class="jam-cap-visor"></div></div>
+                            <div class="eye-left"></div><div class="eye-right"></div>
                         </div>
                     </div>
                     <strong style="color:#2ed573; font-size:11px;">잼</strong>
@@ -132,11 +147,12 @@ game_html = """
                             <div class="clap-hair"></div>
                             <div class="clap-headphone-l"></div>
                             <div class="clap-headphone-r"></div>
+                            <div class="eye-left"></div><div class="eye-right"></div>
                             <div class="clap-cloth"></div>
                         </div>
                     </div>
                     <strong style="color:#ffa502; font-size:11px;">클랩🆕</strong>
-                    <div style="font-size:9px; color:#f1f1f1; margin-top:2px; line-height:11px;">체력 110 | 공속 0.5s<br>스택형 폭발 궁극기</div>
+                    <div style="font-size:9px; color:#f1f1f1; margin-top:2px; line-height:11px;">체력 110 | 공속 0.5s<br>궁극기 시전 시 스택0</div>
                 </div>
             </div>
 
@@ -206,8 +222,7 @@ game_html = """
                 this.bushHealTimer = 0; this.popupText = ""; this.popupTimer = 0; 
                 this.jamBuffTimer = 0; this.shieldHp = 0;       
                 
-                // 🛠️ 신규 스탯 및 오리지널 리밸런싱 데이터 정의
-                this.clapStacks = 0; // 클랩 전용 박수 스택 변수
+                this.clapStacks = 0; 
 
                 if(type === "Main") {
                     this.name = "메인"; this.hp = 100; this.maxHp = 100; this.damage = 7;                     
@@ -229,11 +244,11 @@ game_html = """
                     this.range = 7 * GRID; this.atkDelay = 6; this.baseSpeed = 3.9; 
                     this.ultDamage = 0; this.ultRange = 0; this.ultMaxCooldown = 840; 
                     this.color = "#2ed573"; this.faceSymbol = "🎲";
-                } else { // 🛠️ 신규 영웅 클랩 스탯 세팅 완료
+                } else { 
                     this.name = "클랩"; this.hp = 110; this.maxHp = 110; this.damage = 1;
-                    this.range = 10 * GRID; this.atkDelay = 30; // 0.5초 = 30프레임
-                    this.baseSpeed = 4.0; this.ultDamage = 0; // 스택 비례 연산 유동 적용
-                    this.ultRange = 6 * GRID; this.ultMaxCooldown = 780; // 13초 = 780프레임
+                    this.range = 10 * GRID; this.atkDelay = 30; 
+                    this.baseSpeed = 4.0; this.ultDamage = 0; 
+                    this.ultRange = 6 * GRID; this.ultMaxCooldown = 780; 
                     this.color = "#ffa502"; this.faceSymbol = "🎧";
                 }
 
@@ -297,7 +312,14 @@ game_html = """
                 ctx.fillStyle = "white"; ctx.font = "10px Arial";
                 ctx.fillText(this.faceSymbol, this.x + 5, this.y + 22);
 
-                // 상단 스태이터스 텍스트 정보 표기 (박수 스택 포함)
+                // 인게임 눈 그리기 (눈동자 픽셀 드로잉 추가로 디테일 상승)
+                ctx.fillStyle = "#000";
+                if(this.facing === 1) {
+                    ctx.fillRect(this.x + 16, this.y + 10, 2, 2);
+                } else {
+                    ctx.fillRect(this.x + 7, this.y + 10, 2, 2);
+                }
+
                 ctx.fillStyle = "white"; ctx.font = "9px Arial";
                 let nameLabel = this.name + (this.is1P ? "(1P)" : "(2P)");
                 if(this.type === "Clap") nameLabel += ` [${this.clapStacks}👏]`;
@@ -311,12 +333,11 @@ game_html = """
                     this.popupTimer--;
                 }
 
-                // 체력바 유닛 레이아웃
                 ctx.fillStyle = "#333"; ctx.fillRect(this.x, this.y - 16, 25, 3);
                 ctx.fillStyle = this.hp < (this.maxHp * 0.3) ? "red" : "lime";
                 ctx.fillRect(this.x, this.y - 16, (this.hp / this.maxHp) * 25, 3);
 
-                // 🛠️ [요청] 궁극기 쿨타임/충전 게이지 노란색 바를 상시 뚜렷하게 노출
+                // 상시 노출 노란색 궁극기 게이지 바
                 ctx.fillStyle = "rgba(40,40,40,0.8)"; ctx.fillRect(this.x, this.y - 11, 25, 2.5);
                 ctx.fillStyle = "yellow";
                 let ultPercent = 1 - (this.ultCooldown / this.ultMaxCooldown);
@@ -337,7 +358,6 @@ game_html = """
                     } else if(this.type === "Mari") {
                         ctx.beginPath(); ctx.arc(this.x + 12, this.y + 19, this.ultRange, 0, Math.PI * 2); ctx.stroke();
                     } else if(this.type === "Clap") {
-                        // 클랩의 위쪽과 앞방향 전방 범위를 나타내는 감각적인 반호 펄스 드로잉
                         ctx.fillStyle = "rgba(255, 165, 2, 0.25)";
                         ctx.beginPath();
                         if(this.facing === 1) {
@@ -364,7 +384,6 @@ game_html = """
                     this.vY = 0; this.isJumping = false;
                 }
 
-                // 벽 관통 차단/끼임 무효화 물리 엔진 가동
                 if (selectedMapIndex === 1) {
                     for(let obs of mapObstacles) {
                         if (this.x + this.width > obs.x && this.x < obs.x + obs.w &&
@@ -433,7 +452,6 @@ game_html = """
                 let myL = this.facing === 1 ? this.x + this.width : this.x - validRange;
                 let myR = this.facing === 1 ? this.x + this.width + validRange : this.x;
 
-                // 🛠️ 클랩 일반공격 시 박수 스택 축적 판정 메커니즘 (최대 20스택 상한)
                 if(this.type === "Clap") {
                     if(this.clapStacks < 20) this.clapStacks++;
                 }
@@ -461,7 +479,7 @@ game_html = """
                     let dist = Math.sqrt(dx*dx + dy*dy);
                     if(dist < this.ultRange + 12) { opp.takeDamage(this.ultDamage); this.hp = Math.min(this.maxHp, this.hp + 10); }
                 } else if(this.type === "Clap") {
-                    // 🛠️ [클랩 궁극기] 박수 스택 * 2 만큼의 데미지를 위와 전방 6칸 구역 적에게 투사
+                    // 🛠️ [클랩 패치 변경점] 궁극기 시전 즉시 기존 스택 정보 기반 타격 연산 후 0개로 리셋!
                     this.ultEffectTimer = 15;
                     
                     let targetInUltRange = false;
@@ -470,20 +488,23 @@ game_html = """
                     let distance = Math.sqrt(dx*dx + dy*dy);
 
                     if(distance <= this.ultRange) {
-                        // 전방 방향성 및 위쪽(dy <= 10) 고도 환경 다중 분석 체킹
                         let correctDirection = (this.facing === 1 && dx >= -10) || (this.facing === -1 && dx <= 10);
                         let isAboveOrFront = (dy <= 15) && correctDirection;
                         if(isAboveOrFront) targetInUltRange = true;
                     }
 
+                    let finalClapDamage = this.clapStacks * 2;
+                    
+                    // 🛠️ 궁극기 사용했으므로 스택 초기화 (0개로 초기화)
+                    this.clapStacks = 0;
+
                     if(targetInUltRange) {
-                        let finalClapDamage = this.clapStacks * 2;
                         opp.takeDamage(finalClapDamage);
-                        // 적 명중 시 박수 스택 2 증가 보너스 부여 (상한 20개 내)
-                        if(this.clapStacks < 20) this.clapStacks = Math.min(20, this.clapStacks + 2);
-                        this.popupText = `👏 클랩 스매시! ${finalClapDamage}딜`;
+                        // 궁극기 맞출 시 보너스로 박수 2스택이 추가로 쌓임
+                        this.clapStacks = 2;
+                        this.popupText = `👏 클랩 스매시! ${finalClapDamage}딜 (스택 초기화)`;
                     } else {
-                        this.popupText = "공중 헛손질 👏";
+                        this.popupText = "공중 헛손질 👏 (스택 초기화)";
                     }
                     this.popupTimer = 60;
 
@@ -506,7 +527,7 @@ game_html = """
 
         function selectChar(type) {
             if(!p1Sel) {
-                p1Sel = type; document.getElementById("select-title").innerText = "2P 영웅 낙점 (v1.1v)";
+                p1Sel = type; document.getElementById("select-title").innerText = "2P 영웅 낙점 (v1.15v)";
             } else if(!p2Sel) {
                 p2Sel = type;
                 document.getElementById("select-title").innerText = "전투 시스템 매칭 완료";
@@ -530,8 +551,8 @@ game_html = """
 
         function resetGame() {
             p1Sel = null; p2Sel = null;
-            document.getElementById("select-title").innerText = "1P 영웅 낙점 (v1.1v)";
-            document.getElementById("select-subtitle").innerText = "캐릭터 외형 퀄리티 고도화 패치 완료";
+            document.getElementById("select-title").innerText = "1P 영웅 낙점 (v1.15v)";
+            document.getElementById("select-subtitle").innerText = "클랩 궁극기 스택 초기화 반영 및 미형 외형 패치";
             document.getElementById("select-screen").classList.remove("hidden");
             document.getElementById("result-screen").classList.add("hidden");
             document.getElementById("start-game-btn").classList.add("hidden");
@@ -570,7 +591,7 @@ game_html = """
                 }
             } else if (gameState === "SELECT") {
                 ctx.fillStyle = "#15151c"; ctx.font = "12px Arial";
-                ctx.fillText("픽창에서 전략 지표를 구성하는 중...", 245, 160);
+                ctx.fillText("전장 데이터를 로드하고 있습니다...", 245, 160);
             } else { p1.draw(); p2.draw(); }
             requestAnimationFrame(gameLoop);
         }
