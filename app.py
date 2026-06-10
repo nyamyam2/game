@@ -1,13 +1,11 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# 페이지 레이아웃 및 스타일 최적화
-st.set_page_config(page_title="네온 배틀 v1.20", layout="centered")
+st.set_page_config(page_title="네온 배틀 v1.30", layout="centered")
 
-st.title("⚔️ 네온 배틀 버전 1.20v 공식 패치")
-st.caption("덤불 버프 버그 완벽 픽스! 신캐 여학생 '유리'의 치명적인 매혹 스킬 등장")
+st.title("⚔️ 네온 배틀 버전 1.30v 공식 패치")
+st.caption("✨ 신규 '코롱(패시브)' 특성 시스템 전격 도입! 나만의 맞춤형 전략 세팅")
 
-# 인게임 및 픽창 웹 컴포넌트 소스코드
 game_html = """
 <!DOCTYPE html>
 <html>
@@ -18,53 +16,53 @@ game_html = """
         canvas { background: #050508; border: 3px solid #33333f; display: block; margin: 5px auto; box-shadow: 0 0 15px rgba(0,255,255,0.15); }
         
         .ui-overlay { position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%); background: rgba(8, 8, 12, 0.98); 
-                     padding: 12px; border: 2px solid #00f2ff; border-radius: 12px; width: 590px; z-index: 10; box-shadow: 0 0 30px rgba(0,0,0,0.95); }
+                     padding: 12px; border: 2px solid #00f2ff; border-radius: 12px; width: 610px; z-index: 10; box-shadow: 0 0 30px rgba(0,0,0,0.95); }
         
         .char-container { display: flex; justify-content: center; gap: 6px; margin: 8px 0; }
-        .char-card { background: #1a1a26; border: 2px solid #2d2d3d; border-radius: 10px; padding: 6px; width: 95px; cursor: pointer; transition: 0.2s; text-align: center; }
-        .char-card:hover { transform: scale(1.03); border-color: #00f2ff; background: #222235; }
+        .char-card { background: #1a1a26; border: 2px solid #2d2d3d; border-radius: 10px; padding: 6px; width: 92px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .char-card.selected-p1 { border-color: #00f2ff; background: #182a3c; }
+        .char-card.selected-p2 { border-color: #ff4757; background: #3c1820; }
         
-        /* 🎨 v1.20v 그래픽 엔진 페이스 칩 */
-        .avatar-frame { width: 50px; height: 50px; margin: 0 auto 5px; background: #242436; border-radius: 50%; border: 2px solid #3d3d5c; overflow: hidden; position: relative; }
+        /* 코롱 선택기 스타일 */
+        .cologne-container { display: flex; justify-content: center; gap: 15px; margin: 12px 0; background: #161622; padding: 10px; border-radius: 8px; border: 1px dashed #444; }
+        .cologne-btn { background: #2b2b3d; color: #fff; border: 2px solid #444; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; width: 45%; text-align: left; }
+        .cologne-btn:hover { border-color: #00f2ff; background: #35354e; }
+        .cologne-btn.active { background: #00f2ff; color: #000; font-weight: bold; border-color: #fff; }
         
-        /* 공통 눈 그래픽 */
+        /* 🎨 아바타 그래픽 엔진 */
+        .avatar-frame { width: 45px; height: 45px; margin: 0 auto 5px; background: #242436; border-radius: 50%; border: 2px solid #3d3d5c; overflow: hidden; position: relative; }
         .eye-left, .eye-right { background: #111; width: 4px; height: 4px; border-radius: 50%; position: absolute; top: 12px; z-index: 5; }
-        .eye-left { left: 6px; }
-        .eye-right { left: 16px; }
+        .eye-left { left: 6px; } .eye-right { left: 16px; }
         .eye-left::after, .eye-right::after { content: ''; background: #fff; width: 1.5px; height: 1.5px; border-radius: 50%; position: absolute; top: 0.5px; left: 0.5px; }
 
-        /* 캐릭터별 CSS 초상화 의상/헤어 세팅 */
-        .hero-main { background: #ffd2a1; width: 30px; height: 32px; border-radius: 50%; position: absolute; bottom: 8px; left: 10px; }
+        .hero-main { background: #ffd2a1; width: 30px; height: 32px; border-radius: 50%; position: absolute; bottom: 8px; left: 8px; }
         .main-hair-top { background: #1a1a1a; width: 34px; height: 16px; position: absolute; top: -3px; left: -2px; border-radius: 8px 8px 0 0; }
         .main-suit { background: #1e90ff; width: 40px; height: 15px; position: absolute; bottom: 0; left: -5px; border-radius: 4px 4px 0 0; }
 
-        .hero-mari { background: #ffe3ca; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 10px; left: 11px; z-index: 2; }
-        .mari-long-hair-back { background: #4a2831; width: 34px; height: 38px; position: absolute; top: 12px; left: 8px; border-radius: 4px 4px 12px 12px; z-index: 1; }
+        .hero-mari { background: #ffe3ca; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 10px; left: 9px; z-index: 2; }
+        .mari-long-hair-back { background: #4a2831; width: 34px; height: 38px; position: absolute; top: 12px; left: 6px; border-radius: 4px 4px 12px 12px; z-index: 1; }
         .mari-hair-top { background: #ff527b; width: 32px; height: 16px; position: absolute; top: -4px; left: -2px; border-radius: 8px 8px 0 0; }
         .mari-dress { background: #ff00ff; width: 36px; height: 14px; position: absolute; bottom: -12px; left: -4px; border-radius: 50% 50% 0 0; }
 
-        .hero-star { background: #ffe0bd; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 11px; }
+        .hero-star { background: #ffe0bd; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 9px; }
         .star-crown-gold { background: #f1c40f; width: 22px; height: 12px; position: absolute; top: -10px; left: 3px; clip-path: polygon(0 100%, 0 20%, 30% 60%, 50% 0, 70% 60%, 100% 20%, 100% 100%); z-index: 6; }
         .star-hair-blonde { background: #fecc5c; width: 32px; height: 14px; position: absolute; top: -2px; left: -2px; border-radius: 6px 6px 0 0; }
         
-        .hero-jam { background: #ffd2a1; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 11px; }
+        .hero-jam { background: #ffd2a1; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 9px; }
         .jam-green-cap { background: #2ed573; width: 32px; height: 12px; position: absolute; top: -4px; left: -2px; border-radius: 4px 4px 0 0; z-index: 6; }
 
-        .hero-clap { background: #fcd1a1; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 11px; }
+        .hero-clap { background: #fcd1a1; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 9px; }
         .clap-hair { background: #eccc68; width: 32px; height: 14px; position: absolute; top: -3px; left: -2px; border-radius: 6px 6px 0 0; }
         .clap-headphone-l { background: #ff4757; width: 6px; height: 14px; position: absolute; top: 6px; left: -4px; border-radius: 3px; z-index: 6; }
         .clap-headphone-r { background: #ff4757; width: 6px; height: 14px; position: absolute; top: 6px; left: 26px; border-radius: 3px; z-index: 6; }
 
-        /* 🎀 [신캐] 유리 CSS 초상화: 단정한 일본식 교복 세일러 카라 + 하이 포니테일 */
-        .hero-yuri { background: #fff1e0; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 11px; z-index: 2; }
-        .yuri-ponytail { background: #4b382a; width: 14px; height: 26px; position: absolute; top: 4px; left: 24px; border-radius: 0 12px 12px 0; transform: rotate(10deg); z-index: 1; }
+        .hero-yuri { background: #fff1e0; width: 28px; height: 30px; border-radius: 50%; position: absolute; bottom: 8px; left: 9px; z-index: 2; }
+        .yuri-ponytail { background: #4b382a; width: 14px; height: 26px; position: absolute; top: 4px; left: 22px; border-radius: 0 12px 12px 0; transform: rotate(10deg); z-index: 1; }
         .yuri-hair-top { background: #4b382a; width: 32px; height: 15px; position: absolute; top: -3px; left: -2px; border-radius: 8px 8px 0 0; }
-        .yuri-eye-l, .yuri-eye-r { background: #ff4757; width: 45; height: 4px; border-radius: 50%; position: absolute; top: 11px; z-index: 5; }
         .yuri-uniform { background: #3b3b4f; width: 36px; height: 12px; position: absolute; bottom: -10px; left: -4px; border-radius: 3px; }
-        .yuri-ribbon { background: #ff4757; width: 8px; height: 5px; position: absolute; bottom: -6px; left: 10px; z-index: 4; border-radius: 2px; }
 
         .map-container { display: flex; justify-content: center; gap: 10px; margin: 5px 0; }
-        .map-btn { padding: 6px 14px; font-size: 11px; cursor: pointer; border: 2px solid #555; background: #333; color: white; font-weight: bold; border-radius: 6px; }
+        .map-btn { padding: 5px 12px; font-size: 11px; cursor: pointer; border: 2px solid #555; background: #333; color: white; border-radius: 6px; }
         .map-btn.selected { border-color: #2ed573; background: #1e4620; }
         
         .start-action-btn { background: #2ed573; color: white; padding: 10px 30px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; margin-top: 4px; }
@@ -82,48 +80,49 @@ game_html = """
         </div>
 
         <div id="select-screen" class="ui-overlay">
-            <h3 id="select-title" style="color:#00f2ff; margin: 0 0 2px 0; font-size: 15px;">1P 영웅 낙점 (v1.20v)</h3>
-            <p id="select-subtitle" style="font-size:11px; color:#aaa; margin:0 0 6px 0;">덤불 버그 핫픽스 및 신캐 유혹 마스터 '유리' 추가</p>
+            <h3 id="select-title" style="color:#00f2ff; margin: 0 0 2px 0; font-size: 15px;">1P 영웅 낙점 (v1.30v)</h3>
+            <p id="select-subtitle" style="font-size:11px; color:#aaa; margin:0 0 6px 0;">영웅을 클릭한 뒤 하단에서 고유 '코롱(패시브)' 특성을 선택하세요.</p>
             
             <div class="char-container">
-                <div class="char-card" onclick="selectChar('Main')">
+                <div class="char-card" id="card-Main" onclick="selectChar('Main')">
                     <div class="avatar-frame"><div class="hero-main"><div class="main-hair-top"></div><div class="eye-left"></div><div class="eye-right"></div><div class="main-suit"></div></div></div>
                     <strong style="color:#6dd5fa; font-size:11px;">메인</strong>
                 </div>
-                <div class="char-card" onclick="selectChar('Mari')">
+                <div class="char-card" id="card-Mari" onclick="selectChar('Mari')">
                     <div class="mari-long-hair-back"></div>
                     <div class="avatar-frame" style="background:#3a2936; border-color:#5c3d52;"><div class="hero-mari"><div class="mari-hair-top"></div><div class="eye-left"></div><div class="eye-right"></div><div class="mari-dress"></div></div></div>
                     <strong style="color:#ff77ff; font-size:11px;">마리👩‍🦰</strong>
                 </div>
-                <div class="char-card" onclick="selectChar('Star')">
+                <div class="char-card" id="card-Star" onclick="selectChar('Star')">
                     <div class="avatar-frame"><div class="hero-star"><div class="star-hair-blonde"></div><div class="star-crown-gold"></div><div class="eye-left"></div><div class="eye-right"></div></div></div>
                     <strong style="color:#ffca28; font-size:11px;">스타</strong>
                 </div>
-                <div class="char-card" onclick="selectChar('Jam')">
+                <div class="char-card" id="card-Jam" onclick="selectChar('Jam')">
                     <div class="avatar-frame"><div class="hero-jam"><div class="jam-green-cap"></div><div class="eye-left"></div><div class="eye-right"></div></div></div>
                     <strong style="color:#2ed573; font-size:11px;">잼</strong>
                 </div>
-                <div class="char-card" onclick="selectChar('Clap')">
+                <div class="char-card" id="card-Clap" onclick="selectChar('Clap')">
                     <div class="avatar-frame" style="background:#362f24; border-color:#5c4e3d;"><div class="hero-clap"><div class="clap-hair"></div><div class="clap-headphone-l"></div><div class="clap-headphone-r"></div><div class="eye-left"></div><div class="eye-right"></div></div></div>
                     <strong style="color:#ffa502; font-size:11px;">클랩</strong>
                 </div>
-                <div class="char-card" onclick="selectChar('Yuri')">
+                <div class="char-card" id="card-Yuri" onclick="selectChar('Yuri')">
                     <div class="yuri-ponytail"></div>
-                    <div class="avatar-frame" style="background:#3a2d24; border-color:#5c4636;">
-                        <div class="hero-yuri">
-                            <div class="yuri-hair-top"></div>
-                            <div class="eye-left" style="background:#ff4757;"></div><div class="eye-right" style="background:#ff4757;"></div>
-                            <div class="yuri-uniform"></div>
-                            <div class="yuri-ribbon"></div>
-                        </div>
-                    </div>
+                    <div class="avatar-frame" style="background:#3a2d24; border-color:#5c4636;"><div class="hero-yuri"><div class="yuri-hair-top"></div><div class="eye-left" style="background:#ff4757;"></div><div class="eye-right" style="background:#ff4757;"></div><div class="yuri-uniform"></div></div></div>
                     <strong style="color:#ff4757; font-size:11px;">유리💖</strong>
+                </div>
+            </div>
+
+            <div id="cologne-panel" class="hidden">
+                <div style="font-size: 11px; color: #fffa65; margin-bottom: 4px; font-weight: bold;" id="cologne-panel-title">패시브 스킬(코롱) 선택</div>
+                <div class="cologne-container">
+                    <button id="col-btn-1" class="cologne-btn" onclick="chooseCologne(1)">코롱 1: 불러오는 중...</button>
+                    <button id="col-btn-2" class="cologne-btn" onclick="chooseCologne(2)">코롱 2: 불러오는 중...</button>
                 </div>
             </div>
 
             <div class="map-container">
                 <button id="map0-btn" class="map-btn selected" onclick="selectMap(0)">평지 아레나</button>
-                <button id="map1-btn" class="map-btn" onclick="selectMap(1)">네온 미로 (덤불 버프 픽스 완료)</button>
+                <button id="map1-btn" class="map-btn" onclick="selectMap(1)">네온 미로 (덤불 완벽 작동)</button>
             </div>
 
             <button id="start-game-btn" class="start-action-btn hidden" onclick="confirmStart()">전장 진입하기</button>
@@ -146,18 +145,25 @@ game_html = """
         
         let gameState = "SELECT";
         let p1Sel = null, p2Sel = null;
+        let p1Cologne = 1, p2Cologne = 1;
+        let selectPhase = "P1_CHAR"; // P1_CHAR -> P1_COL -> P2_CHAR -> P2_COL -> READY
         let selectedMapIndex = 0;
 
-        const mapObstacles = [
-            { x: 140, y: 270, w: 45, h: 40 }, 
-            { x: 475, y: 270, w: 45, h: 40 }, 
-            { x: 260, y: 195, w: 140, h: 20 } 
-        ];
+        // 코롱 특성 설명 DB 다운로드
+        const cologneData = {
+            Main: { c1: "코롱1: 최대체력 +15 증가", c2: "코롱2: 궁극기 쿨타임 1초 감소" },
+            Mari: { c1: "코롱1: 평타 시 25% 확률로 +3딜", c2: "코롱2: 대기 시 1초당 보호막 +2" },
+            Star: { c1: "코롱1: 궁 사용시 적에게 5딜 원격 타격", c2: "코롱2: 일반 공격 데미지 +1" },
+            Jam:  { c1: "코롱1: 평타 시 5% 확률로 궁 즉시충전", c2: "코롱2: 꽝 나오면 다음 궁 무조건 대박" },
+            Clap: { c1: "코롱1: 스택 * 2%만큼 이동속도 증가", c2: "코롱2: 궁극기 기본 데미지 +5" },
+            Yuri: { c1: "코롱1: 평타 적중시 1초간 이속 +15%", c2: "코롱2: 적 매혹 시 초당 체력 4 회복" }
+        };
 
+        const mapObstacles = [
+            { x: 140, y: 270, w: 45, h: 40 }, { x: 475, y: 270, w: 45, h: 40 }, { x: 260, y: 195, w: 140, h: 20 } 
+        ];
         const mapBushes = [
-            { x: 40, y: 260, w: 70, h: 50 },
-            { x: 550, y: 260, w: 70, h: 50 },
-            { x: 300, y: 145, w: 60, h: 50 }
+            { x: 40, y: 260, w: 70, h: 50 }, { x: 550, y: 260, w: 70, h: 50 }, { x: 300, y: 145, w: 60, h: 50 }
         ];
 
         const keys = {};
@@ -165,7 +171,6 @@ game_html = """
             keys[e.code] = true; 
             if(["Space", "ArrowUp", "ArrowDown"].includes(e.code)) e.preventDefault();
             if(gameState === "PLAY") {
-                // 매혹 디버프 상태에서는 공격 및 궁극기 작동 원천 차단
                 if(e.code === "KeyF" && p1.charmTimer <= 0) p1.attack(p2);
                 if(e.code === "KeyG" && p1.charmTimer <= 0) p1.useUltimate(p2);
                 if(e.code === "ArrowDown" && p2.charmTimer <= 0) p2.attack(p1);
@@ -175,38 +180,39 @@ game_html = """
         window.addEventListener("keyup", (e) => { keys[e.code] = false; });
 
         class Player {
-            constructor(x, y, type, is1P) {
-                this.is1P = is1P; this.type = type;
-                this.x = x; this.y = y;
-                this.oldX = x; this.oldY = y;
-                this.width = 25; this.height = 38; 
-                this.vY = 0;
-                this.facing = is1P ? 1 : -1;
-                this.isJumping = false;
+            constructor(x, y, type, is1P, cologneChoice) {
+                this.is1P = is1P; this.type = type; this.cologne = cologneChoice;
+                this.x = x; this.y = y; this.oldX = x; this.oldY = y;
+                this.width = 25; this.height = 38; this.vY = 0;
+                this.facing = is1P ? 1 : -1; this.isJumping = false;
                 
-                // 버그 없는 완벽한 버프 타이머 독립 변수화
                 this.slowTimer = 0; this.buffTimer = 0; this.inBush = false;     
                 this.popupText = ""; this.popupTimer = 0; 
                 this.jamBuffTimer = 0; this.shieldHp = 0;       
                 
-                // 유리 전용 매혹 & 도트딜 상태이상 타이머 변수
-                this.charmTimer = 0;
-                this.dotDamageTimer = 0;
-                this.dotDamageCount = 0;
+                this.charmTimer = 0; this.dotDamageTimer = 0; this.dotDamageCount = 0;
                 this.clapStacks = 0; 
 
+                // 코롱 전용 내부 정밀 파라미터 제어기
+                this.mariNoAtkTimer = 0;
+                this.jamNextIsJackpot = false;
+                this.yuriHitBuffTimer = 0;
+
                 if(type === "Main") {
-                    this.name = "메인"; this.hp = 100; this.maxHp = 100; this.damage = 7;                     
+                    let maxHpBonus = (this.cologne === 1) ? 15 : 0;
+                    this.name = "메인"; this.hp = 100 + maxHpBonus; this.maxHp = 100 + maxHpBonus; this.damage = 7;                     
                     this.range = 4 * GRID; this.atkDelay = 18; this.baseSpeed = 4.2; 
-                    this.ultDamage = 18; this.ultRange = 8 * GRID; this.ultMaxCooldown = 660;           
+                    this.ultDamage = 18; this.ultRange = 8 * GRID; 
+                    this.ultMaxCooldown = (this.cologne === 2) ? 600 : 660; // 코롱2 장착 시 궁쿨 1초 감소 (60프레임 감소)
                     this.color = "#1e90ff"; this.faceSymbol = "🕶️";
                 } else if(type === "Mari") {
                     this.name = "마리"; this.hp = 90; this.maxHp = 90; this.damage = 9;                     
                     this.range = 15 * GRID; this.atkDelay = 75; this.baseSpeed = 3.6;           
-                    this.ultDamage = 20; this.ultRange = 4 * GRID; this.ultMaxCooldown = 720; 
+                    this.transparentUltDamage = 20; this.ultRange = 4 * GRID; this.ultMaxCooldown = 720; 
                     this.color = "#ff00ff"; this.faceSymbol = "🎀";
                 } else if(type === "Star") { 
-                    this.name = "스타"; this.hp = 125; this.maxHp = 125; this.damage = 6;                     
+                    this.name = "스타"; this.hp = 125; this.maxHp = 125; 
+                    this.damage = (this.cologne === 2) ? 7 : 6; // 코롱2 장착 시 평타 데미지 +1 보너스                     
                     this.range = 7 * GRID; this.atkDelay = 42; this.baseSpeed = 3.9; 
                     this.ultDamage = 0; this.ultRange = 0; this.ultMaxCooldown = 780; 
                     this.color = "#ffca28"; this.faceSymbol = "👑";
@@ -217,15 +223,13 @@ game_html = """
                     this.color = "#2ed573"; this.faceSymbol = "🎲";
                 } else if(type === "Clap") { 
                     this.name = "클랩"; this.hp = 110; this.maxHp = 110; this.damage = 1;
-                    this.range = 10 * GRID; this.atkDelay = 30; 
-                    this.baseSpeed = 4.0; this.ultDamage = 0; 
+                    this.range = 10 * GRID; this.atkDelay = 30; this.baseSpeed = 4.0; 
                     this.ultRange = 6 * GRID; this.ultMaxCooldown = 780; 
                     this.color = "#ffa502"; this.faceSymbol = "🎧";
-                } else { // 💖 신규 영웅 '유리' 스탯 할당 완료
+                } else { 
                     this.name = "유리"; this.hp = 100; this.maxHp = 100; this.damage = 4;
-                    this.range = 7 * GRID; this.atkDelay = 18; // 0.3초 (60fps 기준 18프레임)
-                    this.baseSpeed = 4.0; this.ultDamage = 3; 
-                    this.ultRange = 5 * GRID; this.ultMaxCooldown = 900; // 15초 = 900프레임
+                    this.range = 7 * GRID; this.atkDelay = 18; this.baseSpeed = 4.0; 
+                    this.ultRange = 5 * GRID; this.ultMaxCooldown = 900; 
                     this.color = "#ff4757"; this.faceSymbol = "🎓";
                 }
 
@@ -234,10 +238,19 @@ game_html = """
             }
 
             get currentSpeed() {
-                if (this.charmTimer > 0) return 2.0; // 매혹 시 조작 불가 상태로 유리를 향해 느리게 자동 맹진
+                if (this.charmTimer > 0) return 2.0; 
                 let speed = this.baseSpeed;
                 if (this.slowTimer > 0) speed *= 0.70;    
                 if (this.buffTimer > 0) speed *= 1.50;    
+                
+                // [클랩 코롱1] 박수스택당 2% 속도 보너스 연산 조립
+                if (this.type === "Clap" && this.cologne === 1) {
+                    speed *= (1 + (this.clapStacks * 0.02));
+                }
+                // [유리 코롱1] 평타 적중시 이속 15% 가속 엔진 활성화
+                if (this.type === "Yuri" && this.cologne === 1 && this.yuriHitBuffTimer > 0) {
+                    speed *= 1.15;
+                }
                 return speed;
             }
 
@@ -275,9 +288,9 @@ game_html = """
                 if(this.inBush) ctx.globalAlpha = 0.4; 
 
                 ctx.shadowBlur = 10; ctx.shadowColor = this.color;
-                if (this.charmTimer > 0) ctx.fillStyle = "#ff758c"; // 매혹 시 러블리 핑크색으로 깜빡임
+                if (this.charmTimer > 0) ctx.fillStyle = "#ff758c"; 
                 else if (this.slowTimer > 0) ctx.fillStyle = "#57606f"; 
-                else if (this.buffTimer > 0 || this.jamBuffTimer > 0) ctx.fillStyle = "#fff200"; 
+                else if (this.buffTimer > 0 || this.jamBuffTimer > 0 || this.yuriHitBuffTimer > 0) ctx.fillStyle = "#fff200"; 
                 else ctx.fillStyle = this.color;
                 
                 ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -291,16 +304,12 @@ game_html = """
                 ctx.fillStyle = "white"; ctx.font = "10px Arial";
                 ctx.fillText(this.faceSymbol, this.x + 5, this.y + 22);
 
-                // 실시간 안면 눈동자 렌더링
                 ctx.fillStyle = this.charmTimer > 0 ? "red" : "#000";
-                if(this.facing === 1) {
-                    ctx.fillRect(this.x + 16, this.y + 10, 2, 2);
-                } else {
-                    ctx.fillRect(this.x + 7, this.y + 10, 2, 2);
-                }
+                if(this.facing === 1) ctx.fillRect(this.x + 16, this.y + 10, 2, 2);
+                else ctx.fillRect(this.x + 7, this.y + 10, 2, 2);
 
                 ctx.fillStyle = "white"; ctx.font = "9px Arial";
-                let nameLabel = this.name + (this.is1P ? "(1P)" : "(2P)");
+                let nameLabel = this.name + (this.is1P ? "(1P)" : "(2P)") + ` [C${this.cologne}]`;
                 if(this.type === "Clap") nameLabel += ` [${this.clapStacks}👏]`;
                 ctx.fillText(nameLabel, this.x - 5, this.y - 25);
                 
@@ -317,7 +326,6 @@ game_html = """
                 ctx.fillStyle = this.hp < (this.maxHp * 0.3) ? "red" : "lime";
                 ctx.fillRect(this.x, this.y - 16, (this.hp / this.maxHp) * 25, 3);
 
-                // 궁극기 게이지 상시 노출
                 ctx.fillStyle = "rgba(40,40,40,0.8)"; ctx.fillRect(this.x, this.y - 11, 25, 2.5);
                 ctx.fillStyle = "yellow";
                 let ultPercent = 1 - (this.ultCooldown / this.ultMaxCooldown);
@@ -336,7 +344,6 @@ game_html = """
                         let rX = this.facing === 1 ? this.x + this.width : this.x - this.lastRenderRange;
                         ctx.strokeRect(rX, this.y, this.lastRenderRange, this.height);
                     } else if(this.type === "Mari" || this.type === "Yuri") {
-                        // 유리 전방위 원형 사랑의 파동 시각화 효과
                         ctx.strokeStyle = this.type === "Yuri" ? "#ff4757" : "yellow";
                         ctx.beginPath(); ctx.arc(this.x + 12, this.y + 19, this.ultRange, 0, Math.PI * 2); ctx.stroke();
                     } else if(this.type === "Clap") {
@@ -356,12 +363,18 @@ game_html = """
             update(opp) {
                 this.oldX = this.x; this.oldY = this.y;
                 
-                // 🛠️ 매혹 알고리즘: 유리 방향으로 강제 이끌림 이동 제어
                 if (this.charmTimer > 0) {
                     this.charmTimer--;
                     if (opp) {
                         if (this.x < opp.x) { this.x += this.currentSpeed; this.facing = 1; }
                         else { this.x -= this.currentSpeed; this.facing = -1; }
+                    }
+                    // [유리 코롱2] 적이 매혹에 걸려있을 시 매 초당 유리의 체력을 4씩 회복시킴
+                    if (opp && opp.type === "Yuri" && opp.cologne === 2) {
+                        if (this.charmTimer % 60 === 0) {
+                            opp.hp = Math.min(opp.maxHp, opp.hp + 4);
+                            opp.popupText = "💖 매혹 흡수 힐링 +4"; opp.popupTimer = 25;
+                        }
                     }
                 }
 
@@ -380,9 +393,7 @@ game_html = """
                                 this.y = obs.y - this.height; this.vY = 0; this.isJumping = false;
                             } else if (this.oldY >= obs.y + obs.h) {
                                 this.y = obs.y + obs.h; this.vY = 0;
-                            } else {
-                                this.x = this.oldX;
-                            }
+                            } else { this.x = this.oldX; }
                         }
                     }
                 }
@@ -392,7 +403,6 @@ game_html = """
                 
                 this.checkBushIntersection();
 
-                // 🛠️ [버그 픽스] 덤불 속 쿨타임 가속 버프 정상 작동 처리 보장
                 let cooldownSpeed = this.inBush ? 1.50 : 1.0; 
                 if(this.atkCooldown > 0) this.atkCooldown = Math.max(0, this.atkCooldown - cooldownSpeed);
                 if(this.ultCooldown > 0) this.ultCooldown = Math.max(0, this.ultCooldown - cooldownSpeed);
@@ -400,21 +410,30 @@ game_html = """
                 if(this.slowTimer > 0) this.slowTimer--;
                 if(this.buffTimer > 0) this.buffTimer--;
                 if(this.jamBuffTimer > 0) this.jamBuffTimer--;
+                if(this.yuriHitBuffTimer > 0) this.yuriHitBuffTimer--;
 
-                // 유리의 도트 데미지 틱 계산기 (1초=60프레임마다 작동)
+                // [마리 코롱2] 공격을 안 하고 1초 대기할 때마다 보호막 생성 로직
+                if (this.type === "Mari" && this.cologne === 2) {
+                    if (this.atkCooldown === 0) {
+                        this.mariNoAtkTimer++;
+                        if (this.mariNoAtkTimer >= 60) {
+                            this.shieldHp = Math.min(30, this.shieldHp + 2);
+                            this.mariNoAtkTimer = 0;
+                        }
+                    } else { this.mariNoAtkTimer = 0; }
+                }
+
                 if (this.dotDamageTimer > 0) {
                     this.dotDamageTimer--;
                     if (this.dotDamageTimer % 60 === 0 && this.dotDamageCount > 0) {
-                        this.takeDamage(3);
-                        this.dotDamageCount--;
-                        this.popupText = "🎵 하트 음표 틱! -3";
-                        this.popupTimer = 30;
+                        this.takeDamage(3); this.dotDamageCount--;
+                        this.popupText = "🎵 하트 음표 틱! -3"; this.popupTimer = 30;
                     }
                 }
             }
 
             jump() {
-                if (this.charmTimer > 0) return; // 매혹 시 점프 불능
+                if (this.charmTimer > 0) return; 
                 let 온그라운드 = (this.y >= canvas.height - this.height - 15);
                 if (selectedMapIndex === 1) {
                     for(let obs of mapObstacles) {
@@ -457,14 +476,40 @@ game_html = """
                     if(this.clapStacks < 20) this.clapStacks++;
                 }
 
+                // [잼 코롱1] 일반 공격 시 5% 확률로 궁극기 게이지 즉시 충전 완료
+                if (this.type === "Jam" && this.cologne === 1) {
+                    if (Math.random() < 0.05) {
+                        this.ultCooldown = 0; this.popupText = "⚡ 코롱 대성공! 궁 즉시 충전"; this.popupTimer = 45;
+                    }
+                }
+
                 if(myR >= opp.x && myL <= opp.x + opp.width && this.y + this.height >= opp.y && this.y <= opp.y + opp.height) {
-                    opp.takeDamage(this.damage);
+                    let finalDmg = this.damage;
+                    
+                    // [마리 코롱1] 25% 확률로 +3 추가 데미지 부여
+                    if (this.type === "Mari" && this.cologne === 1) {
+                        if (Math.random() < 0.25) {
+                            finalDmg += 3; this.popupText = "💥 코롱 크리티컬 +3!"; this.popupTimer = 35;
+                        }
+                    }
+
+                    opp.takeDamage(finalDmg);
+
+                    // [유리 코롱1] 평타 적중 시 이동 속도 1초간 가속 발동
+                    if (this.type === "Yuri" && this.cologne === 1) {
+                        this.yuriHitBuffTimer = 60; this.popupText = "⚡ 발걸음 가뿐! (이속 +15%)"; this.popupTimer = 30;
+                    }
                 }
             }
 
             useUltimate(opp) {
                 if(this.ultCooldown > 0 || this.charmTimer > 0) return;
                 this.ultCooldown = this.ultMaxCooldown;
+
+                // [스타 코롱1] 궁극기 시전 시 즉시 상대에게 원격 5 데미지 충격파 선사
+                if (this.type === "Star" && this.cologne === 1) {
+                    opp.takeDamage(5); opp.popupText = "⚡ 스타 코롱 저격! -5"; opp.popupTimer = 40;
+                }
 
                 if(this.type === "Main") {
                     let validUltRange = this.calculateWallBlockingRange(this.ultRange);
@@ -478,7 +523,7 @@ game_html = """
                     this.ultEffectTimer = 15;
                     let dx = (this.x + 12) - (opp.x + 12); let dy = (this.y + 19) - (opp.y + 19);
                     let dist = Math.sqrt(dx*dx + dy*dy);
-                    if(dist < this.ultRange + 12) { opp.takeDamage(this.ultDamage); this.hp = Math.min(this.maxHp, this.hp + 10); }
+                    if(dist < this.ultRange + 12) { opp.takeDamage(this.transparentUltDamage); this.hp = Math.min(this.maxHp, this.hp + 10); }
                 } else if(this.type === "Clap") {
                     this.ultEffectTimer = 15;
                     let targetInUltRange = false;
@@ -488,39 +533,53 @@ game_html = """
                         let correctDirection = (this.facing === 1 && dx >= -10) || (this.facing === -1 && dx <= 10);
                         if((dy <= 15) && correctDirection) targetInUltRange = true;
                     }
-                    let finalClapDamage = this.clapStacks * 2;
+                    
+                    // [클랩 코롱2] 궁극기 데미지 기본 +5 보너스 정산 결합
+                    let baseBonus = (this.cologne === 2) ? 5 : 0;
+                    let finalClapDamage = (this.clapStacks * 2) + baseBonus;
                     this.clapStacks = 0;
+
                     if(targetInUltRange) {
                         opp.takeDamage(finalClapDamage); this.clapStacks = 2;
                         this.popupText = `👏 클랩 스매시! ${finalClapDamage}딜`;
                     } else { this.popupText = "공중 헛손질 👏"; }
                     this.popupTimer = 60;
                 } else if(this.type === "Yuri") {
-                    // 🛠️ [유리 궁극기] 전방위 5칸 레이더 탐색 후 사랑의 매혹 노래 투사
                     this.ultEffectTimer = 25;
-                    let dx = (this.x + 12) - (opp.x + 12);
-                    let dy = (this.y + 19) - (opp.y + 19);
+                    let dx = (this.x + 12) - (opp.x + 12); let dy = (this.y + 19) - (opp.y + 19);
                     let dist = Math.sqrt(dx*dx + dy*dy);
-                    
                     if(dist <= this.ultRange + 15) {
-                        opp.charmTimer = 120; // 2초간 매혹 (60fps * 2 = 120)
-                        opp.dotDamageTimer = 181; // 총 3초간 지속기 세팅
-                        opp.dotDamageCount = 3;   // 총 3번 타격틱 명중시킴
-                        this.popupText = "💖 사랑의 노래! (2초 매혹 돌입)";
-                    } else {
-                        this.popupText = "노래 메아리가 닿지 않음 💔";
-                    }
+                        opp.charmTimer = 120; opp.dotDamageTimer = 181; opp.dotDamageCount = 3;   
+                        this.popupText = "💖 사랑의 노래! (2초 매혹)";
+                    } else { this.popupText = "노래 메아리가 닿지 않음 💔"; }
                     this.popupTimer = 70;
                 } else if(this.type === "Star") {
                     this.ultEffectTimer = 15; this.buffTimer = 120;
                 } else if(this.type === "Jam") {
-                    this.ultEffectTimer = 15; let rnd = Math.random();
-                    if (rnd < 0.10) { opp.takeDamage(25); this.popupText = "💥 대박! 25 데미지!!"; } 
-                    else if (rnd < 0.30) { this.hp = Math.min(this.maxHp, this.hp + 20); this.popupText = "💚 힐링! HP +20 회복"; } 
-                    else if (rnd < 0.40) { this.jamBuffTimer = 120; this.popupText = "🏹 신속! 사거리 +3칸"; } 
-                    else if (rnd < 0.60) { this.x = opp.x + (opp.facing === 1 ? -30 : 30); this.y = opp.y; opp.takeDamage(10); this.popupText = "🔮 습격! 순간이동"; } 
-                    else if (rnd < 0.80) { this.shieldHp = 15; this.popupText = "🛡️ 방어! 배리어 활성"; } 
-                    else { this.popupText = "💨 꽝! 다음 기회에"; }
+                    this.ultEffectTimer = 15; 
+                    let rnd = Math.random();
+                    
+                    // [잼 코롱2] 직전 판이 꽝이었다면 이번 판 주사위 무조건 확정 대박 처리 리다이렉트
+                    if (this.cologne === 2 && this.jamNextIsJackpot) {
+                        rnd = 0.05; // 10% 미만 대박 확정 난수로 강제 보정
+                        this.jamNextIsJackpot = false; // 일회성이므로 플래그 회수
+                    }
+
+                    if (rnd < 0.10) { 
+                        opp.takeDamage(25); this.popupText = "💥 대박! 25 데미지!!"; 
+                    } else if (rnd < 0.30) { 
+                        this.hp = Math.min(this.maxHp, this.hp + 20); this.popupText = "💚 힐링! HP +20 회복"; 
+                    } else if (rnd < 0.40) { 
+                        this.jamBuffTimer = 120; this.popupText = "🏹 신속! 사거리 +3칸"; 
+                    } else if (rnd < 0.60) { 
+                        this.x = opp.x + (opp.facing === 1 ? -30 : 30); this.y = opp.y; opp.takeDamage(10); this.popupText = "🔮 습격! 순간이동"; 
+                    } else if (rnd < 0.80) { 
+                        this.shieldHp = 15; this.popupText = "🛡️ 방어! 배리어 활성"; 
+                    } else { 
+                        this.popupText = "💨 꽝! 다음 기회에"; 
+                        // [잼 코롱2] 보정 스택 활성화
+                        if (this.cologne === 2) this.jamNextIsJackpot = true;
+                    }
                     this.popupTimer = 100; 
                 }
             }
@@ -529,13 +588,60 @@ game_html = """
         let p1, p2;
 
         function selectChar(type) {
-            if(!p1Sel) {
-                p1Sel = type; document.getElementById("select-title").innerText = "2P 영웅 낙점 (v1.20v)";
-            } else if(!p2Sel) {
+            // 현재 타겟팅 카드 리셋 및 발광 효과 제어
+            if (selectPhase === "P1_CHAR") {
+                p1Sel = type;
+                document.querySelectorAll(".char-card").forEach(c => c.classList.remove("selected-p1"));
+                document.getElementById("card-" + type).classList.add("selected-p1");
+                
+                // 코롱 동적 폼 패널 오픈
+                document.getElementById("cologne-panel").classList.remove("hidden");
+                document.getElementById("cologne-panel-title").innerText = `▶ 1P [${type}]의 패시브 코롱 향수 장착`;
+                document.getElementById("col-btn-1").innerText = cologneData[type].c1;
+                document.getElementById("col-btn-2").innerText = cologneData[type].c2;
+                document.getElementById("col-btn-1").classList.add("active");
+                document.getElementById("col-btn-2").classList.remove("active");
+                p1Cologne = 1;
+                selectPhase = "P1_COL";
+            } else if (selectPhase === "P2_CHAR") {
                 p2Sel = type;
-                document.getElementById("select-title").innerText = "전투 시스템 매칭 완료";
-                document.getElementById("select-subtitle").innerText = "아래 진입하기 버튼을 클릭하여 전투를 시작하세요.";
-                document.getElementById("start-game-btn").classList.remove("hidden");
+                document.querySelectorAll(".char-card").forEach(c => c.classList.remove("selected-p2"));
+                document.getElementById("card-" + type).classList.add("selected-p2");
+                
+                document.getElementById("cologne-panel").classList.remove("hidden");
+                document.getElementById("cologne-panel-title").innerText = `▶ 2P [${type}]의 패시브 코롱 향수 장착`;
+                document.getElementById("col-btn-1").innerText = cologneData[type].c1;
+                document.getElementById("col-btn-2").innerText = cologneData[type].c2;
+                document.getElementById("col-btn-1").classList.add("active");
+                document.getElementById("col-btn-2").classList.remove("active");
+                p2Cologne = 1;
+                selectPhase = "P2_COL";
+            }
+        }
+
+        function chooseCologne(num) {
+            if (selectPhase === "P1_COL") {
+                p1Cologne = num;
+                document.getElementById("col-btn-1").classList.toggle("active", num === 1);
+                document.getElementById("col-btn-2").classList.toggle("active", num === 2);
+                
+                // 1P 세팅 종료 후 즉시 2P 영웅 픽 단계로 연쇄 토글 전환
+                setTimeout(() => {
+                    selectPhase = "P2_CHAR";
+                    document.getElementById("select-title").innerText = "2P 영웅 낙점 (v1.30v)";
+                    document.getElementById("cologne-panel").classList.add("hidden");
+                }, 400);
+
+            } else if (selectPhase === "P2_COL") {
+                p2Cologne = num;
+                document.getElementById("col-btn-1").classList.toggle("active", num === 1);
+                document.getElementById("col-btn-2").classList.toggle("active", num === 2);
+                
+                setTimeout(() => {
+                    selectPhase = "READY";
+                    document.getElementById("select-title").innerText = "모든 특성 세팅 및 동기화 완료";
+                    document.getElementById("start-game-btn").classList.remove("hidden");
+                }, 400);
             }
         }
 
@@ -548,17 +654,22 @@ game_html = """
 
         function confirmStart() {
             document.getElementById("select-screen").classList.add("hidden");
-            p1 = new Player(100, 200, p1Sel, true); p2 = new Player(530, 200, p2Sel, false);
+            p1 = new Player(100, 200, p1Sel, true, p1Cologne); 
+            p2 = new Player(530, 200, p2Sel, false, p2Cologne);
             gameState = "PLAY";
         }
 
         function resetGame() {
-            p1Sel = null; p2Sel = null;
-            document.getElementById("select-title").innerText = "1P 영웅 낙점 (v1.20v)";
-            document.getElementById("select-subtitle").innerText = "덤불 버그 핫픽스 및 신캐 유혹 마스터 '유리' 추가";
+            p1Sel = null; p2Sel = null; p1Cologne = 1; p2Cologne = 1;
+            selectPhase = "P1_CHAR";
+            document.querySelectorAll(".char-card").forEach(c => {
+                c.classList.remove("selected-p1"); c.classList.remove("selected-p2");
+            });
+            document.getElementById("select-title").innerText = "1P 영웅 낙점 (v1.30v)";
             document.getElementById("select-screen").classList.remove("hidden");
             document.getElementById("result-screen").classList.add("hidden");
             document.getElementById("start-game-btn").classList.add("hidden");
+            document.getElementById("cologne-panel").classList.add("hidden");
             gameState = "SELECT";
         }
 
@@ -575,7 +686,6 @@ game_html = """
             ctx.fillStyle = "#22222a"; ctx.fillRect(0, canvas.height - 15, canvas.width, 15);
 
             if(gameState === "PLAY") {
-                // 매혹 상태를 판별하기 위해 상대 플레이어 정보를 상호 참조 업데이트 전달
                 if (p1.charmTimer <= 0) {
                     if (keys["KeyA"]) { p1.x -= p1.currentSpeed; p1.facing = -1; }
                     if (keys["KeyD"]) { p1.x += p1.currentSpeed; p1.facing = 1; }
@@ -596,7 +706,7 @@ game_html = """
                 }
             } else if (gameState === "SELECT") {
                 ctx.fillStyle = "#15151c"; ctx.font = "12px Arial";
-                ctx.fillText("영웅을 선택해 전장 밸런스를 시험해 보세요.", 225, 160);
+                ctx.fillText("코롱 패시브 엔진이 장착 대기 중입니다.", 230, 160);
             } else { p1.draw(); p2.draw(); }
             requestAnimationFrame(gameLoop);
         }
