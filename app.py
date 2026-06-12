@@ -1,10 +1,10 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="네온 배틀 v1.40", layout="centered")
+st.set_page_config(page_title="네온 배틀 v1.41", layout="centered")
 
-st.title("⚔️ 네온 배틀 버전 1.40v 공식 패치")
-st.caption("🤖 신캐 '로봇킹' & 싱글 AI 대결 모드 등장! 코롱 시스템 대규모 밸런스 개편 완료")
+st.title("⚔️ 네온 배틀 버전 1.41v 패치")
+st.caption("🤖 AI 벽 공격 방지(난이도:보통) & 미니로봇 크기 확대 및 타격 가능 패치 완료!")
 
 game_html = """
 <!DOCTYPE html>
@@ -54,7 +54,6 @@ game_html = """
         .yuri-ponytail { background: #4b382a; width: 14px; height: 24px; position: absolute; top: 4px; left: 20px; border-radius: 0 12px 12px 0; transform: rotate(10deg); z-index: 1; }
         .yuri-hair-top { background: #4b382a; width: 30px; height: 14px; position: absolute; top: -3px; left: -2px; border-radius: 8px 8px 0 0; }
 
-        /* 🤖 로봇킹 아바타 비주얼 스타일 */
         .hero-robot { background: #747d8c; width: 28px; height: 28px; border-radius: 4px; position: absolute; bottom: 6px; left: 7px; border: 1px solid #a4b0be; }
         .robot-antenna { background: #ff4757; width: 4px; height: 10px; position: absolute; top: -9px; left: 12px; border-radius: 2px; }
         .robot-eye-neon { background: #00f2ff; width: 18px; height: 4px; position: absolute; top: 8px; left: 5px; box-shadow: 0 0 6px #00f2ff; }
@@ -78,8 +77,8 @@ game_html = """
         </div>
 
         <div id="select-screen" class="ui-overlay">
-            <h3 id="select-title" style="color:#00f2ff; margin: 0 0 2px 0; font-size: 15px;">1P 영웅 낙점 (v1.40v)</h3>
-            <p id="select-subtitle" style="font-size:11px; color:#aaa; margin:0 0 6px 0;">원하는 캐릭터 카드를 클릭하고 코롱을 선택해 보세요.</p>
+            <h3 id="select-title" style="color:#00f2ff; margin: 0 0 2px 0; font-size: 15px;">1P 영웅 낙점 (v1.41v)</h3>
+            <p id="select-subtitle" style="font-size:11px; color:#aaa; margin:0 0 6px 0;">인공지능 벽 공격 방지 알고리즘 및 밸런스 조정 패치판</p>
             
             <div class="char-container">
                 <div class="char-card" id="card-Main" onclick="selectChar('Main')">
@@ -124,12 +123,12 @@ game_html = """
 
             <div class="map-container">
                 <button id="mode-pvp-btn" class="map-btn selected" onclick="selectMode('PVP')">인간 vs 인간 (2P)</button>
-                <button id="mode-ai-btn" class="map-btn" onclick="selectMode('AI')">인간 vs 인공지능 (AI)</button>
+                <button id="mode-ai-btn" class="map-btn" onclick="selectMode('AI')">인간 vs 인공지능 (AI: 보통)</button>
             </div>
 
             <div class="map-container">
                 <button id="map0-btn" class="map-btn selected" onclick="selectMap(0)">평지 아레나</button>
-                <button id="map1-btn" class="map-btn" onclick="selectMap(1)">네온 미로 (덤불 버그 픽스 완료)</button>
+                <button id="map1-btn" class="map-btn" onclick="selectMap(1)">네온 미로 (덤불회복 1.5초)</button>
             </div>
 
             <button id="start-game-btn" class="start-action-btn hidden" onclick="confirmStart()">전장 진입하기</button>
@@ -151,19 +150,19 @@ game_html = """
         const GRAVITY = 0.55;
         
         let gameState = "SELECT";
-        let playMode = "PVP"; // PVP or AI
+        let playMode = "PVP"; 
         let p1Sel = null, p2Sel = null;
         let p1Cologne = 1, p2Cologne = 1;
         let selectPhase = "P1_CHAR"; 
         let selectedMapIndex = 0;
 
         const cologneData = {
-            Main: { c1: "코롱1: 최대체력 110으로 조정 (너프)", c2: "코롱2: 궁극기 쿨타임 1.5초 감소 (버프)" },
-            Mari: { c1: "코롱1: 평타 시 30% 확률로 +3딜 (버프)", c2: "코롱2: 대기 시 초당 보호막 +2 (최대 50)" },
+            Main: { c1: "코롱1: 최대체력 +5 및 공격력 +1 증가 (리워크)", c2: "코롱2: 궁극기 쿨타임 1.5초 감소" },
+            Mari: { c1: "코롱1: 평타 시 30% 확률로 +3딜", c2: "코롱2: 대기 시 초당 보호막 +2 (최대 50)" },
             Star: { c1: "코롱1: 궁 사용시 적에게 즉시 5딜 타격", c2: "코롱2: 일반 공격 데미지 +1 상시증가" },
-            Jam:  { c1: "코롱1: 평타 명중시 8% 확률로 궁 즉시충전", c2: "코롱2: 꽝 나오면 다음 궁 무조건 대박" },
-            Clap: { c1: "코롱1: 이속삭제 / 평타 시 박수 획득량 +1", c2: "코롱2: 궁극기 베이스 데미지 +5 보너스" },
-            Yuri: { c1: "코롱1: 이속삭제 / 평타 시 25% 확률로 1.5초 매혹", c2: "코롱2: 적 매혹 시 유리의 체력 초당 4 회복" },
+            Jam:  { c1: "코롱1: 평타 명중시 8% 확률로 궁 즉시충전", c2: "코롱2: 꽝 나오면 다음 대박 데미지 +5 (버프)" },
+            Clap: { c1: "코롱1: 타격 명중 시에만 박수 획득량 +1", c2: "코롱2: 궁극기 베이스 데미지 +5 보너스" },
+            Yuri: { c1: "코롱1: 타격 명중 시 25% 확률로 1.5초 매혹", c2: "코롱2: 적 매혹 시 유리의 체력 초당 4 회복" },
             Robot:{ c1: "코롱1: 패시브 이속 35% 가속 & 공속 0.2초 단축", c2: "코롱2: 미니 로봇의 스탯 강화 (체력+5, 공격+1)" }
         };
 
@@ -174,21 +173,21 @@ game_html = """
             { x: 40, y: 260, w: 70, h: 50 }, { x: 550, y: 260, w: 70, h: 50 }, { x: 300, y: 145, w: 60, h: 50 }
         ];
 
-        // 미니 로봇 소환수 클래스
+        // 🤖 미니 로봇 클래스 (크기 확대 피격 판정 및 체력 동기화 구현)
         class MiniRobot {
             constructor(x, y, is1P, enhanced) {
                 this.is1P = is1P;
-                this.x = x + (Math.random() * 20 - 10);
-                this.y = y;
-                this.width = 12;
-                this.height = 14;
+                this.x = x + (Math.random() * 30 - 15);
+                this.y = y - 10;
+                this.width = 22;  // 크기 키움 (12 -> 22)
+                this.height = 24; // 크기 키움 (14 -> 24)
                 this.vY = 0;
                 this.hp = enhanced ? 25 : 20;
                 this.maxHp = this.hp;
                 this.damage = enhanced ? 4 : 3;
                 this.speed = 2.4; 
                 this.range = 3 * GRID;
-                this.atkDelay = 30; // 0.5초 = 30프레임
+                this.atkDelay = 30; 
                 this.atkCooldown = 0;
             }
             update(opp) {
@@ -197,7 +196,6 @@ game_html = """
                 if(this.y >= canvas.height - this.height - 15) {
                     this.y = canvas.height - this.height - 15; this.vY = 0;
                 }
-                // 맵 충돌 처리 간단 동기화
                 if(selectedMapIndex === 1) {
                     for(let obs of mapObstacles) {
                         if (this.x + this.width > obs.x && this.x < obs.x + obs.w && this.y + this.height > obs.y && this.y < obs.y + obs.h) {
@@ -206,13 +204,11 @@ game_html = """
                     }
                 }
 
-                // 상대를 집요하게 따라다니는 AI 알고리즘
                 let dx = opp.x - this.x;
-                if(Math.abs(dx) > this.range - 10) {
+                if(Math.abs(dx) > this.range - 5) {
                     this.x += Math.sign(dx) * this.speed;
                 }
 
-                // 미니 로봇 자동 원격 공격 연산
                 if(this.atkCooldown > 0) this.atkCooldown--;
                 else {
                     let dist = Math.sqrt(dx*dx + (opp.y - this.y)*(opp.y - this.y));
@@ -226,9 +222,14 @@ game_html = """
                 ctx.save();
                 ctx.fillStyle = this.is1P ? "#00f2ff" : "#ff4757";
                 ctx.fillRect(this.x, this.y, this.width, this.height);
+                
+                // 체력바 가시화 추가
+                ctx.fillStyle = "red"; ctx.fillRect(this.x, this.y - 6, this.width, 2);
+                ctx.fillStyle = "lime"; ctx.fillRect(this.x, this.y - 6, (this.hp / this.maxHp) * this.width, 2);
+
                 ctx.fillStyle = "white";
-                ctx.fillRect(this.x + 2, this.y + 3, 3, 2);
-                ctx.fillRect(this.x + 7, this.y + 3, 3, 2);
+                ctx.fillRect(this.x + 4, this.y + 5, 4, 3);
+                ctx.fillRect(this.x + 14, this.y + 5, 4, 3);
                 ctx.restore();
             }
         }
@@ -261,16 +262,17 @@ game_html = """
                 
                 this.charmTimer = 0; this.dotDamageTimer = 0; this.dotDamageCount = 0;
                 this.clapStacks = 0; this.stunTimer = 0;
-
                 this.mariNoAtkTimer = 0;
                 this.jamNextIsJackpot = false;
 
                 if(type === "Main") {
-                    let hpMax = (this.cologne === 1) ? 110 : 100;
-                    this.name = "메인"; this.hp = hpMax; this.maxHp = hpMax; this.damage = 7;                     
+                    // 메인 코롱1 리워크: 체력 +5증가, 공격력 +1증가
+                    let hpMax = (this.cologne === 1) ? 105 : 100;
+                    this.name = "메인"; this.hp = hpMax; this.maxHp = hpMax; 
+                    this.damage = (this.cologne === 1) ? 8 : 7;                     
                     this.range = 4 * GRID; this.atkDelay = 18; this.baseSpeed = 4.2; 
                     this.ultDamage = 18; this.ultRange = 8 * GRID; 
-                    this.ultMaxCooldown = (this.cologne === 2) ? 570 : 660; // 1.5초 버프 (90프레임 감소)
+                    this.ultMaxCooldown = (this.cologne === 2) ? 570 : 660; 
                     this.color = "#1e90ff"; this.faceSymbol = "🕶️";
                 } else if(type === "Mari") {
                     this.name = "마리"; this.hp = 90; this.maxHp = 90; this.damage = 9;                     
@@ -298,12 +300,11 @@ game_html = """
                     this.range = 7 * GRID; this.atkDelay = 18; this.baseSpeed = 4.0; 
                     this.ultRange = 5 * GRID; this.ultMaxCooldown = 900; 
                     this.color = "#ff4757"; this.faceSymbol = "🎓";
-                } else { // 🤖 신규 캐릭터 로봇킹 기본 스탯 할당 엔진
-                    this.name = "로봇킹"; this.hp = 120; this.maxHp = 120; this.damage = 8;
+                } else { 
+                    // 로봇킹 일반 데미지 1 하향 패치 (8 -> 7)
+                    this.name = "로봇킹"; this.hp = 120; this.maxHp = 120; this.damage = 7;
                     this.range = 4 * GRID; 
-                    // 로봇킹 코롱1 선택 시 공속 0.2초 단축 (12 프레임 감소)
                     this.atkDelay = (this.cologne === 1) ? 108 : 120; 
-                    // 로봇킹 코롱1 선택 시 이동속도 35% 가속 적용
                     this.baseSpeed = (this.cologne === 1) ? 3.5 * 1.35 : 3.5;
                     this.ultRange = 0; this.ultMaxCooldown = 900; 
                     this.color = "#747d8c"; this.faceSymbol = "🤖";
@@ -315,7 +316,7 @@ game_html = """
 
             get currentSpeed() {
                 if (this.charmTimer > 0) return 2.0; 
-                if (this.stunTimer > 0) return 0; // 스턴 상태 시 이동속도 제로 차단
+                if (this.stunTimer > 0) return 0; 
                 let speed = this.baseSpeed;
                 if (this.slowTimer > 0) speed *= 0.70;    
                 if (this.buffTimer > 0) speed *= 1.50;    
@@ -356,18 +357,13 @@ game_html = """
                 if(this.inBush) ctx.globalAlpha = 0.4; 
 
                 ctx.shadowBlur = 10; ctx.shadowColor = this.color;
-                if (this.stunTimer > 0) ctx.fillStyle = "#ffa502"; // 스턴 시 주황색
+                if (this.stunTimer > 0) ctx.fillStyle = "#ffa502"; 
                 else if (this.charmTimer > 0) ctx.fillStyle = "#ff758c"; 
                 else if (this.slowTimer > 0) ctx.fillStyle = "#57606f"; 
                 else if (this.buffTimer > 0 || this.jamBuffTimer > 0) ctx.fillStyle = "#fff200"; 
                 else ctx.fillStyle = this.color;
                 
-                // 로봇킹 외형 커스텀 라운드 스퀘어 형태화
-                if(this.type === "Robot") {
-                    ctx.fillRect(this.x, this.y, this.width, this.height);
-                } else {
-                    ctx.fillRect(this.x, this.y, this.width, this.height);
-                }
+                ctx.fillRect(this.x, this.y, this.width, this.height);
                 ctx.shadowBlur = 0;
 
                 if(this.shieldHp > 0) {
@@ -389,7 +385,6 @@ game_html = """
                 
                 if (this.stunTimer > 0) { ctx.fillStyle = "#ffa502"; ctx.fillText("💫기절💫", this.x - 4, this.y - 32); }
                 else if (this.charmTimer > 0) { ctx.fillStyle = "#ff4757"; ctx.fillText("♥매혹♥", this.x - 4, this.y - 32); }
-                else if (this.slowTimer > 0) { ctx.fillStyle = "#00f2ff"; ctx.fillText("SLOW", this.x, this.y - 32); }
 
                 if (this.popupTimer > 0) {
                     ctx.fillStyle = "#fffa65"; ctx.font = "bold 9px Arial";
@@ -437,7 +432,6 @@ game_html = """
 
             update(opp) {
                 this.oldX = this.x; this.oldY = this.y;
-                
                 if (this.stunTimer > 0) this.stunTimer--;
 
                 if (this.charmTimer > 0) {
@@ -446,20 +440,11 @@ game_html = """
                         if (this.x < opp.x) { this.x += this.currentSpeed; this.facing = 1; }
                         else { this.x -= this.currentSpeed; this.facing = -1; }
                     }
-                    if (opp && opp.type === "Yuri" && opp.cologne === 2) {
-                        if (this.charmTimer % 60 === 0) {
-                            opp.hp = Math.min(opp.maxHp, opp.hp + 4);
-                            opp.popupText = "💖 매혹 흡수 힐링 +4"; opp.popupTimer = 25;
-                        }
-                    }
                 }
 
-                // 스턴 중에는 중력만 작동하고 제어 차단
                 this.vY += GRAVITY; this.y += this.vY;
-                
                 if (this.y >= canvas.height - this.height - 15) {
-                    this.y = canvas.height - this.height - 15;
-                    this.vY = 0; this.isJumping = false;
+                    this.y = canvas.height - this.height - 15; this.vY = 0; this.isJumping = false;
                 }
 
                 if (selectedMapIndex === 1) {
@@ -480,10 +465,10 @@ game_html = """
                 
                 this.checkBushIntersection();
 
-                // 🛠️ [버그 완벽 픽스] 덤불에 있으면 1초당 3씩 체력 정상 회복 동기화
+                // 🛠️ [덤불회복 1.5초 동기화] 90프레임 주기로 치유 연산 가동
                 if(this.inBush && this.hp > 0) {
                     this.bushHealTimer++;
-                    if(this.bushHealTimer >= 60) {
+                    if(this.bushHealTimer >= 90) { 
                         this.hp = Math.min(this.maxHp, this.hp + 3);
                         this.popupText = "🌿 덤불 치유 +3"; this.popupTimer = 25;
                         this.bushHealTimer = 0;
@@ -498,7 +483,6 @@ game_html = """
                 if(this.buffTimer > 0) this.buffTimer--;
                 if(this.jamBuffTimer > 0) this.jamBuffTimer--;
 
-                // [마리 코롱2] 최대 충전 한도 50으로 상향 패치
                 if (this.type === "Mari" && this.cologne === 2) {
                     if (this.atkCooldown === 0) {
                         this.mariNoAtkTimer++;
@@ -558,41 +542,45 @@ game_html = """
                 let myL = this.facing === 1 ? this.x + this.width : this.x - validRange;
                 let myR = this.facing === 1 ? this.x + this.width + validRange : this.x;
 
-                // [클랩 코롱1] 공격 시 박수 획득 개수 +1 증가 버프 (기존 1 -> 2스택)
-                if(this.type === "Clap") {
+                let hitOpponent = (myR >= opp.x && myL <= opp.x + opp.width && this.y + this.height >= opp.y && this.y <= opp.y + opp.height);
+
+                // 🛠️ [미니로봇 피격 메커니즘] 플레이어가 일반공격을 뻗었을 때 범위 내의 미니로봇 타격 및 파괴 가능
+                for(let i = activeMinions.length - 1; i >= 0; i--) {
+                    let m = activeMinions[i];
+                    // 적 진영의 소환수만 타격 가능
+                    if (m.is1P !== this.is1P) {
+                        if(myR >= m.x && myL <= m.x + m.width && this.y + this.height >= m.y && this.y <= m.y + m.height) {
+                            m.hp -= this.damage;
+                            this.popupText = "💥 미니로봇 요격 성공!"; this.popupTimer = 25;
+                            if(m.hp <= 0) activeMinions.splice(i, 1);
+                        }
+                    }
+                }
+
+                // 🛠️ [클랩 리워크] 오직 타격 성공(명중) 시에만 스택 연산이 일어나도록 변경
+                if(this.type === "Clap" && hitOpponent) {
                     let gain = (this.cologne === 1) ? 2 : 1;
                     if(this.clapStacks < 20) this.clapStacks = Math.min(20, this.clapStacks + gain);
                 }
 
-                if(myR >= opp.x && myL <= opp.x + opp.width && this.y + this.height >= opp.y && this.y <= opp.y + opp.height) {
+                if(hitOpponent) {
                     let finalDmg = this.damage;
-                    
                     if (this.type === "Mari" && this.cologne === 1) {
-                        if (Math.random() < 0.30) { // 30%로 상향
-                            finalDmg += 3; this.popupText = "💥 코롱 크리티컬 +3!"; this.popupTimer = 35;
-                        }
+                        if (Math.random() < 0.30) { finalDmg += 3; this.popupText = "💥 코롱 크리티컬 +3!"; this.popupTimer = 35; }
                     }
 
                     opp.takeDamage(finalDmg);
 
-                    // 🛠️ [잼 코롱1 리워크] 명중 시에만 8% 확률로 궁 즉시 충전 작동
                     if (this.type === "Jam" && this.cologne === 1) {
-                        if (Math.random() < 0.08) {
-                            this.ultCooldown = 0; this.popupText = "⚡ 명중! 궁 즉시 100% 충전"; this.popupTimer = 45;
-                        }
+                        if (Math.random() < 0.08) { this.ultCooldown = 0; this.popupText = "⚡ 명중! 궁 즉시 100% 충전"; this.popupTimer = 45; }
                     }
 
-                    // 🛠️ [유리 코롱1 리워크] 공격 적중 시 25% 확률로 1.5초 매혹 부여
                     if (this.type === "Yuri" && this.cologne === 1) {
-                        if(Math.random() < 0.25) {
-                            opp.charmTimer = 90; this.popupText = "💘 하트 뿅! 기습 매혹 (1.5초)"; this.popupTimer = 40;
-                        }
+                        if(Math.random() < 0.25) { opp.charmTimer = 90; this.popupText = "💘 기습 매혹 (1.5초)"; this.popupTimer = 40; }
                     }
 
-                    // 🤖 [로봇킹 패시브 타격] 상대 1칸 넉백 및 0.5초 스턴 연산
                     if (this.type === "Robot") {
-                        opp.stunTimer = 30; // 0.5초 기절
-                        opp.x += this.facing * GRID * 1.5; // 약 1.5칸 넉백
+                        opp.stunTimer = 30; opp.x += this.facing * GRID * 1.5; 
                         opp.popupText = "⚙️ 메카 펀치! 기절+넉백"; opp.popupTimer = 30;
                     }
                 }
@@ -644,14 +632,13 @@ game_html = """
                     if(dist <= this.ultRange + 15) {
                         opp.charmTimer = 120; opp.dotDamageTimer = 181; opp.dotDamageCount = 3;   
                         this.popupText = "💖 사랑의 노래! (2초 매혹)";
-                    } else { this.popupText = "노래 메아리가 닿지 않음 💔"; }
+                    }
                     this.popupTimer = 70;
                 } else if(this.type === "Star") {
                     this.ultEffectTimer = 15; this.buffTimer = 120;
                 } else if(this.type === "Robot") {
-                    // 🤖 [로봇킹 궁극기] 미니 로봇 소환식 실행
                     this.ultEffectTimer = 20;
-                    let isEnhanced = (this.cologne === 2); // 코롱2 장착 시 미니로봇 버프
+                    let isEnhanced = (this.cologne === 2); 
                     for(let i=0; i<3; i++) {
                         activeMinions.push(new MiniRobot(this.x, this.y, this.is1P, isEnhanced));
                     }
@@ -659,7 +646,13 @@ game_html = """
                 } else if(this.type === "Jam") {
                     this.ultEffectTimer = 15; let rnd = Math.random();
                     if (this.cologne === 2 && this.jamNextIsJackpot) { rnd = 0.05; this.jamNextIsJackpot = false; }
-                    if (rnd < 0.10) { opp.takeDamage(25); this.popupText = "💥 대박! 25 데미지!!"; } 
+                    
+                    if (rnd < 0.10) { 
+                        // 🛠️ [잼 코롱2 버프] 꽝 다음 대박 데미지 +5 증가 반영 (기존 25 -> 30)
+                        let jackpotDmg = (this.cologne === 2) ? 30 : 25;
+                        opp.takeDamage(jackpotDmg); 
+                        this.popupText = `💥 대박! ${jackpotDmg} 데미지!!`; 
+                    } 
                     else if (rnd < 0.30) { this.hp = Math.min(this.maxHp, this.hp + 20); this.popupText = "💚 힐링! HP +20 회복"; } 
                     else if (rnd < 0.40) { this.jamBuffTimer = 120; this.popupText = "🏹 신속! 사거리 +3칸"; } 
                     else if (rnd < 0.60) { this.x = opp.x + (opp.facing === 1 ? -30 : 30); this.y = opp.y; opp.takeDamage(10); this.popupText = "🔮 습격! 순간이동"; } 
@@ -671,18 +664,12 @@ game_html = """
         }
 
         let p1, p2;
-        let activeMinions = []; // 전장에 출격한 모든 소환수 배열
+        let activeMinions = []; 
 
         function selectMode(mode) {
             playMode = mode;
             document.getElementById("mode-pvp-btn").classList.toggle("selected", mode === "PVP");
             document.getElementById("mode-ai-btn").classList.toggle("selected", mode === "AI");
-            
-            if(mode === "AI") {
-                document.getElementById("p2-control-hint").innerText = "2P: 컴퓨터(AI) 자동 제어 모드";
-            } else {
-                document.getElementById("p2-control-hint").innerText = "2P: ◀/▶(이동), ▲(점프), ↓(평타), L(궁극기)";
-            }
         }
 
         function selectChar(type) {
@@ -723,18 +710,17 @@ game_html = """
                 
                 setTimeout(() => {
                     if(playMode === "AI") {
-                        // 🛠️ AI 모드 시 2P 선택 단계를 스킵하고 즉시 랜덤 영웅/코롱 추출 배정
                         const heroPool = ["Main", "Mari", "Star", "Jam", "Clap", "Yuri", "Robot"];
                         p2Sel = heroPool[Math.floor(Math.random() * heroPool.length)];
                         p2Cologne = Math.random() < 0.5 ? 1 : 2;
                         
                         selectPhase = "READY";
-                        document.getElementById("select-title").innerText = "AI 상대 구성 완료! 전투 준비 완료";
+                        document.getElementById("select-title").innerText = "AI 상대 구성 완료! 난이도: 보통";
                         document.getElementById("cologne-panel").classList.add("hidden");
                         document.getElementById("start-game-btn").classList.remove("hidden");
                     } else {
                         selectPhase = "P2_CHAR";
-                        document.getElementById("select-title").innerText = "2P 영웅 낙점 (v1.40v)";
+                        document.getElementById("select-title").innerText = "2P 영웅 낙점 (v1.41v)";
                         document.getElementById("cologne-panel").classList.add("hidden");
                     }
                 }, 300);
@@ -774,7 +760,7 @@ game_html = """
             document.querySelectorAll(".char-card").forEach(c => {
                 c.classList.remove("selected-p1"); c.classList.remove("selected-p2");
             });
-            document.getElementById("select-title").innerText = "1P 영웅 낙점 (v1.40v)";
+            document.getElementById("select-title").innerText = "1P 영웅 낙점 (v1.41v)";
             document.getElementById("select-screen").classList.remove("hidden");
             document.getElementById("result-screen").classList.add("hidden");
             document.getElementById("start-game-btn").classList.add("hidden");
@@ -782,7 +768,7 @@ game_html = """
             gameState = "SELECT";
         }
 
-        // 🤖 약간 쉬운 강도의 가벼운 AI 주행 루틴 엔진
+        // 🤖 [AI 알고리즘 고도화] 벽 타격 방지 연산 장치 (난이도: 보통)
         let aiDecisionCounter = 0;
         function runAILogic() {
             if(p2.charmTimer > 0 || p2.stunTimer > 0) return;
@@ -790,27 +776,47 @@ game_html = """
             aiDecisionCounter++;
             let dx = p1.x - p2.x;
 
-            // 1. 추적 무빙 (약간 성기게 접근)
-            if(Math.abs(dx) > p2.currentRange - 15) {
-                if(dx > 0) { p2.x += p2.currentSpeed * 0.85; p2.facing = 1; }
-                else { p2.x -= p2.currentSpeed * 0.85; p2.facing = -1; }
+            // 추적 기동 속도 고정 (보통 난이도 맞춤형 전진)
+            if(Math.abs(dx) > p2.currentRange - 10) {
+                if(dx > 0) { p2.x += p2.currentSpeed; p2.facing = 1; }
+                else { p2.x -= p2.currentSpeed; p2.facing = -1; }
             } else {
-                // 사거리 내부 진입 시 조금 무빙 간보기
-                if(aiDecisionCounter % 50 === 0) p2.facing = Math.sign(dx) || 1;
+                if(aiDecisionCounter % 40 === 0) p2.facing = Math.sign(dx) || 1;
             }
 
-            // 2. 가끔 점프 회피 유도
-            if(aiDecisionCounter % 140 === 0 && Math.random() < 0.4) {
+            if(aiDecisionCounter % 120 === 0 && Math.random() < 0.4) {
                 p2.jump();
             }
 
-            // 3. 공격 사거리 도달 시 타격 시도
+            // 사거리 내 진입 확인
             if(Math.abs(dx) <= p2.currentRange + 10) {
-                if(p2.atkCooldown === 0) p2.attack(p1);
+                if(p2.atkCooldown === 0) {
+                    
+                    // 🛠️ [핵심 인공지능 개화] 자신과 타겟 사이에 구조물(벽)이 존재하는지 확인하는 시선 검사 레이캐스팅
+                    let wallBlocked = false;
+                    if(selectedMapIndex === 1) {
+                        let leftBound = Math.min(p1.x, p2.x);
+                        let rightBound = Math.max(p1.x, p2.x);
+                        for(let obs of mapObstacles) {
+                            // 플레이어 라인 높이 근처에 가로막는 오브젝트 레이어가 존재할 때
+                            if(obs.x + obs.w > leftBound && obs.x < rightBound && p2.y + 15 > obs.y && p2.y < obs.y + obs.h) {
+                                wallBlocked = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 벽이 없을 때에만 칼같이 공격을 뻗도록 유도
+                    if(!wallBlocked) {
+                        p2.attack(p1);
+                    } else {
+                        // 벽에 막히면 점프하여 뛰어넘거나 전술적 우회를 시도함
+                        if(Math.random() < 0.5) p2.jump();
+                    }
+                }
             }
 
-            // 4. 궁극기 게이지 충전 시 즉시 시전 유도
-            if(p2.ultCooldown === 0 && Math.random() < 0.3) {
+            if(p2.ultCooldown === 0 && Math.random() < 0.2) {
                 p2.useUltimate(p1);
             }
         }
@@ -828,14 +834,12 @@ game_html = """
             ctx.fillStyle = "#22222a"; ctx.fillRect(0, canvas.height - 15, canvas.width, 15);
 
             if(gameState === "PLAY") {
-                // 1P 입력 차단 처리 동기화
                 if (p1.charmTimer <= 0 && p1.stunTimer <= 0) {
                     if (keys["KeyA"]) { p1.x -= p1.currentSpeed; p1.facing = -1; }
                     if (keys["KeyD"]) { p1.x += p1.currentSpeed; p1.facing = 1; }
                     if (keys["Space"]) p1.jump();
                 }
 
-                // 모드 분기에 따른 2P 컨트롤 타겟 변경
                 if(playMode === "PVP") {
                     if (p2.charmTimer <= 0 && p2.stunTimer <= 0) {
                         if (keys["ArrowLeft"]) { p2.x -= p2.currentSpeed; p2.facing = -1; }
@@ -843,16 +847,13 @@ game_html = """
                         if (keys["ArrowUp"]) p2.jump();
                     }
                 } else {
-                    runAILogic(); // AI 모드 활성화
+                    runAILogic(); 
                 }
 
-                // 코어 스탯 데이터 업데이트
                 p1.update(p2); p2.update(p1);
 
-                // 소환수 객체 탐색 및 전술 틱 연산
                 for(let i = activeMinions.length - 1; i >= 0; i--) {
                     let m = activeMinions[i];
-                    // 미니로봇의 주인 진영에 맞춰 타겟 공격 타겟 분기
                     let targetEnemy = m.is1P ? p2 : p1;
                     m.update(targetEnemy);
                     m.draw();
@@ -867,7 +868,7 @@ game_html = """
                 }
             } else if (gameState === "SELECT") {
                 ctx.fillStyle = "#15151c"; ctx.font = "12px Arial";
-                ctx.fillText("AI 싱글 및 로봇킹 결투 대기 중...", 245, 160);
+                ctx.fillText("AI 싱글 배틀 필드 준비 중...", 245, 160);
             } else { p1.draw(); p2.draw(); }
             requestAnimationFrame(gameLoop);
         }
